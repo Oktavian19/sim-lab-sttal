@@ -1,0 +1,139 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\PelaporanKerusakan;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
+
+class PelaporanKerusakanController extends Controller
+{
+    public function index()
+    {
+        return view('laporan.index');
+    }
+
+    public function list()
+    {
+        $laporan = PelaporanKerusakan::select('pelaporan_kerusakan.*');
+
+        return DataTables::of($laporan)
+            ->addIndexColumn()
+            ->addColumn('tanggal_lapor', function ($laporan) {
+                return '
+                <div class="text-slate-900 font-medium">'.$laporan->tanggal_lapor->translatedFormat('d M Y').'</div>
+                <div class="text-xs text-slate-400">'.$laporan->tanggal_lapor->format('H:i').' WIB</div>
+            ';
+            })
+            ->addColumn('pelapor', function ($laporan) {
+                return '
+                <div class="font-medium text-slate-900">'.$laporan->pelapor->pangkat.' '.$laporan->pelapor->nama.'</div>
+                <div class="text-xs text-slate-400">NRP. '.$laporan->pelapor->nrp.'</div>
+                ';
+            })
+            ->addColumn('alat', function ($laporan) {
+                return '
+                <div class="text-blue font-medium text-slate-900">'.$laporan->alat->nama_alat.'</div>
+                <div class="text-xs text-slate-400">'.$laporan->alat->laboratorium->nama_lab.'</div>
+                ';
+            })
+            ->addColumn('deskripsi_kerusakan', function ($laporan) {
+                return '
+                <p class="text-slate-900 line-clamp-2">'.$laporan->deskripsi_kerusakan.'</p>
+                <a href="/laporan/'.$laporan->id.'/show" onclick="modalAction(this.href); return false;" class="text-xs text-blue-500 hover:underline mt-1 block"><i class="fa-regular fa-image mr-1"></i>Lihat Foto</a>
+                ';
+            })
+            ->addColumn('status', function ($laporan) {
+                $baseClass = 'text-xs font-medium px-2.5 py-0.5 rounded border';
+
+                switch ($laporan->status_tindak_lanjut) {
+                    case 'selesai':
+                        return '<span class="'.$baseClass.' bg-green-100 text-green-800 border-green-200">Selesai</span>';
+                    case 'sedang_diperbaiki':
+                        return '<span class="'.$baseClass.' bg-yellow-100 text-yellow-800 border-yellow-200">Perbaikan</span>';
+                    case 'menunggu':
+                        return '<span class="'.$baseClass.' bg-red-100 text-red-800 border-red-200">Menunggu</span>';
+                    default:
+                        return '<span class="'.$baseClass.' bg-slate-100 text-slate-600 border-slate-200">-</span>';
+                }
+            })
+            ->addColumn('keterangan_perbaikan', function ($laporan) {
+                return $laporan->keterangan_perbaikan ? '
+                <p class="text-slate-900 line-clamp-2">'.$laporan->keterangan_perbaikan.'</p>
+                ' : '- Belum Ada -';
+            })
+            ->addColumn('aksi', function ($laporan) {
+                return '
+                <a href="/laporan/'.$laporan->id.'/edit" onclick="modalAction(this.href); return false;" class="bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 border border-slate-200 p-2 rounded-md transition text-xs flex items-center justify-center gap-1 mx-auto w-full">
+                    <i class="fa-solid fa-pen"></i> Update
+                </a>
+            ';
+            })
+            ->rawColumns(['tanggal_lapor', 'pelapor', 'alat', 'deskripsi_kerusakan', 'status', 'keterangan_perbaikan', 'aksi'])
+            ->make(true);
+    }
+
+    public function show($id)
+    {
+        $laporan = PelaporanKerusakan::with('alat', 'alat.laboratorium')->findOrFail($id);
+
+        if (! $laporan) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan',
+            ], 404);
+        }
+
+        return view('laporan.show', compact('laporan'));
+    }
+
+    public function edit($id)
+    {
+        $laporan = PelaporanKerusakan::with('alat', 'alat.laboratorium')->findOrFail($id);
+
+        if (! $laporan) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan',
+            ], 404);
+        }
+
+        return view('laporan.edit', compact('laporan'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'status' => 'required',
+            'keterangan_perbaikan' => 'required_if:status,selesai',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $laporan = PelaporanKerusakan::findOrFail($id);
+
+        if (! $laporan) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan',
+            ], 404);
+        }
+
+        $laporan->update([
+            'status_tindak_lanjut' => $request->status,
+            'keterangan_perbaikan' => $request->keterangan_perbaikan,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data berhasil diperbarui.',
+        ]);
+    }
+}
