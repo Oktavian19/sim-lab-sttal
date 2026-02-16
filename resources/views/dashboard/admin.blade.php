@@ -5,10 +5,10 @@
 
 @section('content')
     <!-- Main Content Scrollable Area -->
-    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+    <main class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
         <!-- Welcome Banner -->
         <div
-            class="bg-gradient-to-r from-blue-800 to-blue-600 rounded-lg shadow-lg p-6 mb-8 text-white relative overflow-hidden">
+            class="shrink-0 bg-gradient-to-r from-blue-800 to-blue-600 rounded-lg shadow-lg p-6 mb-8 text-white relative overflow-hidden">
             <div class="relative z-10">
                 <h3 class="text-2xl font-bold mb-2">Selamat Datang, Admin!</h3>
                 <p class="text-blue-100 max-w-2xl">Sistem Informasi Administrasi Laboratorium STTAL siap digunakan. Anda
@@ -20,7 +20,7 @@
         </div>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="shrink-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
             <!-- Card 1: Total Alat -->
             <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500 hover:shadow-md transition-shadow">
@@ -92,7 +92,7 @@
         </div>
 
         <!-- Two Column Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
 
             <!-- Tabel Validasi Peminjaman -->
             <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-slate-200">
@@ -103,9 +103,9 @@
                         class="text-xs font-medium text-blue-600 hover:text-blue-800">Lihat Semua</a>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="overflow-y-auto flex-1">
                     <table class="w-full text-sm text-left text-slate-500">
-                        <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-50 sticky top-0 shadow-sm">
                             <tr>
                                 <th scope="col" class="px-6 py-3">Peminjam (User)</th>
                                 <th scope="col" class="px-6 py-3">Kegiatan</th>
@@ -113,7 +113,7 @@
                                 <th scope="col" class="px-6 py-3">Jumlah Peserta</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-slate-100">
                             @foreach ($peminjaman['validasiData'] as $item)
                                 <tr class="bg-white border-b hover:bg-slate-50">
                                     <td class="px-6 py-4">
@@ -150,24 +150,26 @@
             </div>
 
             <!-- Kolom Kanan: Status Lab & Jadwal Hari Ini -->
-            <div class="lg:col-span-1 space-y-6">
+            <div class="lg:col-span-1 flex flex-col space-y-6 min-h-0">
 
                 <!-- Status Ketersediaan Lab -->
-                <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
-                    <h3 class="font-bold text-slate-800 mb-4 text-sm"><i
-                            class="fa-solid fa-building mr-2 text-blue-500"></i>Status Laboratorium</h3>
-                    <div class="space-y-3">
+                <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 flex-1 flex flex-col overflow-hidden">
+                    <h3 class="font-bold text-slate-800 mb-4 text-sm shrink-0">Status Laboratorium</h3>
+                    <div class="space-y-3 overflow-y-auto flex-1 pr-2">
                         @foreach ($lab['labData'] as $item)
                             @php
-                                $isTersedia = $item->status === 'tersedia';
+                                $isSedangDipakai = in_array($item->id, $lab['active_lab_ids']);
+                                $statusClass = $isSedangDipakai
+                                    ? 'bg-red-50 border-red-500'
+                                    : 'bg-green-50 border-green-500';
+                                $statusText = $isSedangDipakai ? 'Sedang Digunakan' : 'Tersedia';
                             @endphp
 
-                            <div
-                                class="flex items-center justify-between p-2 rounded border-l-4 mb-2 {{ $isTersedia ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500' }}">
+                            <div class="flex items-center justify-between p-2 rounded border-l-4 mb-2 {{ $statusClass }}">
                                 <div>
                                     <p class="text-sm font-semibold text-slate-700">{{ $item->nama_lab }}</p>
 
-                                    @if ($isTersedia)
+                                    @if ($isSedangDipakai)
                                         <p class="text-xs text-slate-500">Kapasitas: {{ $item->kapasitas }}</p>
                                     @else
                                         <p class="text-xs text-slate-500">{{ $item->kegiatan }}</p>
@@ -175,8 +177,8 @@
                                 </div>
 
                                 <span
-                                    class="text-xs font-bold px-2 py-1 rounded {{ $isTersedia ? 'text-green-700 bg-green-200' : 'text-red-700 bg-red-200' }}">
-                                    {{ $isTersedia ? 'Tersedia' : 'Digunakan' }}
+                                    class="text-xs font-bold px-2 py-1 rounded {{ $isSedangDipakai ? 'text-red-700 bg-red-200' : 'text-green-700 bg-green-200' }}">
+                                    {{ $statusText }}
                                 </span>
                             </div>
                         @endforeach
@@ -184,7 +186,7 @@
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="bg-slate-800 rounded-lg shadow-sm p-4 text-white">
+                <div class="bg-slate-800 rounded-lg shadow-sm p-4 text-white shrink-0">
                     <h3 class="font-bold mb-3 text-sm">Aksi Cepat</h3>
                     <div class="grid grid-cols-2 gap-2">
                         <a href="{{ route('alat.index', ['open_modal' => 'true']) }}"

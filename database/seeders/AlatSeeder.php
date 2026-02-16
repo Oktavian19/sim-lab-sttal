@@ -17,16 +17,14 @@ class AlatSeeder extends Seeder
             'merk' => 'Dell',
             'tahun_pengadaan' => 2022,
             'lokasi' => 1,
-            'status_kondisi' => 'baik',
-            'status_ketersediaan' => 'tersedia',
+            'kondisi' => 'baik',
         ]);
         Alat::create([
             'nama_alat' => 'Router Mikrotik',
             'merk' => 'Mikrotik',
             'tahun_pengadaan' => 2021,
             'lokasi' => 2,
-            'status_kondisi' => 'baik',
-            'status_ketersediaan' => 'tersedia',
+            'kondisi' => 'baik',
         ]);
     }
 }

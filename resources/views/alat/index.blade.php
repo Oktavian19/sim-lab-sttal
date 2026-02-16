@@ -27,7 +27,6 @@
                             <th class="px-4 py-3">Lokasi (Lab)</th>
                             <th class="px-4 py-3">Tahun Pengadaan</th>
                             <th class="px-4 py-3">Kondisi</th>
-                            <th class="px-4 py-3">Status</th>
                             <th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -98,11 +97,6 @@
                     {
                         data: 'kondisi',
                         name: 'status_kondisi',
-                        className: 'px-4 py-3'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status_ketersediaan',
                         className: 'px-4 py-3'
                     },
                     {

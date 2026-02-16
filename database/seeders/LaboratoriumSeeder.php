@@ -15,13 +15,13 @@ class LaboratoriumSeeder extends Seeder
         Laboratorium::create([
             'nama_lab' => 'Laboratorium Informatika',
             'kapasitas' => 30,
-            'status' => 'tersedia',
+            'status' => 'aktif',
             'deskripsi' => 'Digunakan untuk praktikum pemrograman dan jaringan',
         ]);
         Laboratorium::create([
             'nama_lab' => 'Laboratorium Elektronika',
             'kapasitas' => 25,
-            'status' => 'tersedia',
+            'status' => 'aktif',
             'deskripsi' => 'Digunakan untuk praktikum rangkaian dan elektronika dasar',
         ]);
     }

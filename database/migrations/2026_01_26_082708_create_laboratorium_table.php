@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_lab', 100);
             $table->integer('kapasitas');
-            $table->enum('status', ['tersedia', 'digunakan', 'perbaikan']);
+            $table->enum('status', ['aktif', 'nonaktif', 'perbaikan']);
             $table->text('deskripsi')->nullable();
             $table->timestamps();
 

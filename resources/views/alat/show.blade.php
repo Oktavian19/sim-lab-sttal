@@ -29,12 +29,12 @@
                     <div class="text-center">
                         <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Kondisi</span>
                         <div class="mt-1">
-                            @if ($alat->status_kondisi == 'baik')
+                            @if ($alat->kondisi == 'baik')
                                 <span
                                     class="px-3 py-1 text-sm font-medium text-green-800 bg-green-100 rounded-full border border-green-200">
                                     Baik
                                 </span>
-                            @elseif($alat->status_kondisi == 'rusak_ringan')
+                            @elseif($alat->kondisi == 'rusak_ringan')
                                 <span
                                     class="px-3 py-1 text-sm font-medium text-yellow-800 bg-yellow-100 rounded-full border border-yellow-200">
                                     Rusak Ringan
@@ -43,28 +43,6 @@
                                 <span
                                     class="px-3 py-1 text-sm font-medium text-red-800 bg-red-100 rounded-full border border-red-200">
                                     Rusak Berat
-                                </span>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="text-center">
-                        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Ketersediaan</span>
-                        <div class="mt-1">
-                            @if ($alat->status_ketersediaan == 'tersedia')
-                                <span
-                                    class="px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full border border-blue-200">
-                                    Tersedia
-                                </span>
-                            @elseif($alat->status_ketersediaan == 'dipinjam')
-                                <span
-                                    class="px-3 py-1 text-sm font-medium text-purple-800 bg-purple-100 rounded-full border border-purple-200">
-                                    Dipinjam
-                                </span>
-                            @else
-                                <span
-                                    class="px-3 py-1 text-sm font-medium text-gray-800 bg-gray-100 rounded-full border border-gray-200">
-                                    Maintenance
                                 </span>
                             @endif
                         </div>
@@ -103,7 +81,6 @@
                 <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
                     <p class="text-blue-800 text-sm font-medium mb-1">Info Sistem:</p>
                     <ul class="list-disc list-inside text-xs text-blue-600">
-                        <li>ID Aset: #{{ $alat->id }}</li>
                         <li>Dibuat pada: {{ $alat->created_at->format('d M Y') }}</li>
                     </ul>
                 </div>

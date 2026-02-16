@@ -17,8 +17,7 @@ return new class extends Migration
             $table->string('merk', 100)->nullable();
             $table->integer('tahun_pengadaan')->nullable();
             $table->foreignId('lokasi')->nullable()->constrained('laboratorium')->nullOnDelete();
-            $table->enum('status_kondisi', ['baik', 'rusak_ringan', 'rusak_berat']);
-            $table->enum('status_ketersediaan', ['tersedia', 'dipinjam', 'maintenance']);
+            $table->enum('kondisi', ['baik', 'rusak', 'maintenance']);
             $table->string('foto_alat')->nullable();
             $table->timestamps();
         });

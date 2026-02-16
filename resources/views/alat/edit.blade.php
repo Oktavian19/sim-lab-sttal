@@ -62,17 +62,17 @@
             </div>
 
                         <div>
-                <label for="status_kondisi" class="block text-sm font-medium text-gray-700">
+                <label for="kondisi" class="block text-sm font-medium text-gray-700">
                     Kondisi Alat
                 </label>
-                <select name="status_kondisi" id="status_kondisi"
+                <select name="kondisi" id="kondisi"
                     class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm
                    focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                    <option value="baik" {{ $alat->status_kondisi == 'baik' ? 'selected' : '' }}>Baik</option>
-                    <option value="rusak_ringan" {{ $alat->status_kondisi == 'rusak_ringan' ? 'selected' : '' }}>Rusak Ringan</option>
-                    <option value="rusak_berat" {{ $alat->status_kondisi == 'rusak_berat' ? 'selected' : '' }}>Rusak Berat</option>
+                    <option value="baik" {{ $alat->kondisi == 'baik' ? 'selected' : '' }}>Baik</option>
+                    <option value="rusak" {{ $alat->kondisi == 'rusak' ? 'selected' : '' }}>Rusak</option>
+                    <option value="maintenance" {{ $alat->kondisi == 'maintenance' ? 'selected' : '' }}>Maintenance</option>
                 </select>
-                <p id="error-lokasi" class="mt-1 text-sm text-red-600"></p>
+                <p id="error-kondisi" class="mt-1 text-sm text-red-600"></p>
             </div>
 
             <div>
@@ -132,7 +132,7 @@
                 lokasi: {
                     required: true
                 },
-                status_kondisi {
+                kondisi: {
                     required: true
                 },
                 foto_alat: {

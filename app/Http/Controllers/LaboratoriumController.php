@@ -37,12 +37,12 @@ class LaboratoriumController extends Controller
                 $baseClass = "text-xs font-medium px-2.5 py-0.5 rounded border";
 
                 switch ($laboratorium->status) {
-                    case 'tersedia':
+                    case 'aktif':
                         return '<span class="' . $baseClass . ' bg-green-100 text-green-800 border-green-200">Tersedia</span>';
-                    case 'maintenance':
+                    case 'perbaikan':
                         return '<span class="' . $baseClass . ' bg-yellow-100 text-yellow-800 border-yellow-200">Perbaikan</span>';
-                    case 'dipakai':
-                        return '<span class="' . $baseClass . ' bg-red-100 text-red-800 border-red-200">Dipakai</span>';
+                    case 'nonaktif':
+                        return '<span class="' . $baseClass . ' bg-red-100 text-red-800 border-red-200">Nonaktif</span>';
                     default:
                         return '<span class="' . $baseClass . ' bg-slate-100 text-slate-600 border-slate-200">-</span>';
                 }
@@ -89,7 +89,7 @@ class LaboratoriumController extends Controller
         Laboratorium::create([
             'nama_lab' => $request->nama_lab,
             'kapasitas' => $request->kapasitas,
-            'status' => 'tersedia',
+            'status' => 'aktif',
             'deskripsi' => $request->deskripsi,
         ]);
 
@@ -118,7 +118,7 @@ class LaboratoriumController extends Controller
         $validator = Validator::make($request->all(), [
             'nama_lab' => 'required|string|max:255',
             'kapasitas' => 'required|integer|min:1',
-            'status' => 'required|in:tersedia,maintenance,dipakai',
+            'status' => 'required|in:aktif,perbaikan,nonaktif',
             'deskripsi' => 'nullable|string',
         ]);
 

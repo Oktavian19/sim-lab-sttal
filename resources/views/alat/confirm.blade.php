@@ -59,13 +59,6 @@
                             </tr>
                         </table>
                     </div>
-
-                    {{-- <div class="flex p-4 text-sm text-blue-800 rounded-lg bg-blue-50 border border-blue-100">
-                        <i class="fas fa-info-circle mr-3 mt-1 text-blue-500"></i>
-                        <div>
-                            <span class="font-bold">Perhatian:</span> Penghapusan alat akan mempengaruhi data mahasiswa yang terkait.
-                        </div>
-                    </div> --}}
                 </div>
 
                 <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3">

@@ -38,32 +38,16 @@ class AlatController extends Controller
             ->addColumn('kondisi', function ($alat) {
                 $baseClass = 'text-xs font-medium px-2.5 py-0.5 rounded border';
 
-                switch ($alat->status_kondisi) {
+                switch ($alat->kondisi) {
                     case 'baik':
                         return '<span class="'.$baseClass.' bg-green-100 text-green-800 border-green-200">Baik</span>';
-                    case 'rusak_ringan':
-                        return '<span class="'.$baseClass.' bg-yellow-100 text-yellow-800 border-yellow-200">Rusak Ringan</span>';
-                    case 'rusak_berat':
-                        return '<span class="'.$baseClass.' bg-red-100 text-red-800 border-red-200">Rusak Berat</span>';
+                    case 'maintenance':
+                        return '<span class="'.$baseClass.' bg-yellow-100 text-yellow-800 border-yellow-200">Maintenance</span>';
+                    case 'rusak':
+                        return '<span class="'.$baseClass.' bg-red-100 text-red-800 border-red-200">Rusak</span>';
                     default:
                         return '<span class="'.$baseClass.' bg-slate-100 text-slate-600 border-slate-200">-</span>';
                 }
-            })
-
-            ->addColumn('status', function ($alat) {
-                $template = '<span class="inline-flex items-center gap-1.5 py-1 px-2 rounded text-xs font-medium %s text-%s-800">
-                            <span class="w-1.5 h-1.5 rounded-full bg-%s-600"></span> %s
-                         </span>';
-
-                if ($alat->status_ketersediaan === 'tersedia') {
-                    return sprintf($template, 'bg-green-100', 'green', 'green', 'Tersedia');
-                }
-
-                if ($alat->status_ketersediaan === 'dipinjam') {
-                    return sprintf($template, 'bg-red-100', 'red', 'red', 'Dipinjam');
-                }
-
-                return sprintf($template, 'bg-yellow-100', 'yellow', 'yellow', 'Maintenance');
             })
 
             ->addColumn('aksi', function ($alat) {
@@ -139,8 +123,7 @@ class AlatController extends Controller
             'merk' => $request->merk,
             'tahun_pengadaan' => $request->tahun_pengadaan,
             'lokasi' => $request->lokasi,
-            'status_kondisi' => 'baik',
-            'status_ketersediaan' => 'tersedia',
+            'kondisi' => 'baik',
             'foto_alat' => $path_foto,
         ]);
 
@@ -172,7 +155,7 @@ class AlatController extends Controller
             'merk' => 'required|min:3|max:100',
             'tahun_pengadaan' => 'required|numeric',
             'lokasi' => 'required',
-            'status_kondisi' => 'required',
+            'kondisi' => 'required',
             'foto_alat' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -208,7 +191,7 @@ class AlatController extends Controller
             'merk' => $request->merk,
             'tahun_pengadaan' => $request->tahun_pengadaan,
             'lokasi' => $request->lokasi,
-            'status_kondisi' => $request->status_kondisi,
+            'kondisi' => $request->kondisi,
             'foto_alat' => $path_foto ?? $alat->foto_alat,
         ]);
 

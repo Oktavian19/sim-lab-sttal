@@ -12,6 +12,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $now = now();
         $user = Auth::user();
 
         if (! $user) {
@@ -22,22 +23,29 @@ class DashboardController extends Controller
             case 'admin':
                 $alat = [
                     'total' => Alat::count(),
-                    'goodPercentage' => Alat::where('status_kondisi', 'baik')->count() / max(Alat::count(), 1) * 100,
+                    'goodPercentage' => Alat::where('kondisi', 'baik')->count() / max(Alat::count(), 1) * 100,
                 ];
                 $peminjaman = [
                     'validasi' => Peminjaman::where('status_pengajuan', 'pending')->count(),
                     'validasiData' => Peminjaman::where('status_pengajuan', 'pending')->get(),
                 ];
+                $activeLoans = Peminjaman::where('status_pengajuan', 'disetujui')
+                    ->where('start_time', '<=', $now)
+                    ->where('end_time', '>=', $now)
+                    ->pluck('id_lab')
+                    ->unique();
+                $jadwalHariIni = Peminjaman::whereDate('start_time', $now->toDateString())->get();
                 $lab = [
                     'total' => Laboratorium::count(),
-                    'used' => Laboratorium::where('status', 'digunakan')->count(),
+                    'used' => $activeLoans->count(),
+                    'active_lab_ids' => $activeLoans->toArray(),
                     'labData' => Laboratorium::all(),
                 ];
                 $lapKerusakan = [
                     'total' => PelaporanKerusakan::count(),
                 ];
 
-                return view('dashboard.admin', compact('alat', 'peminjaman', 'lab', 'lapKerusakan'));
+                return view('dashboard.admin', compact('alat', 'peminjaman', 'jadwalHariIni', 'lab', 'lapKerusakan'));
             case 'user':
                 return view('dashboard.user');
             default:
