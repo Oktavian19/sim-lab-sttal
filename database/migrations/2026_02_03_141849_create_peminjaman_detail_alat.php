@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('peminjaman_id')->constrained('peminjaman')->onDelete('cascade');
             $table->unsignedBigInteger('id_alat');
             $table->string('kondisi_saat_pinjam', 50);
-            $table->string('kondisi_saat_kembali', 50);
+            $table->string('kondisi_saat_kembali', 50)->nullable();
             $table->timestamps();
 
             $table->foreign('id_alat')->references('id')->on('alat')->onDelete('cascade');

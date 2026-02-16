@@ -88,5 +88,10 @@ Route::middleware(['auth'])->group(function () {
             Route::post('{id}/update', [PelaporanKerusakanController::class, 'update'])->name('update');
         });
     });
-    Route::middleware(['role:user'])->group(function () {});
+    Route::middleware(['role:user'])->group(function () {
+        Route::prefix('peminjaman')->name('peminjaman.')->group(function () {
+            Route::get('/create', [PeminjamanController::class, 'create'])->name('create');
+            Route::post('/store', [PeminjamanController::class, 'store'])->name('store');
+        });
+    });
 });

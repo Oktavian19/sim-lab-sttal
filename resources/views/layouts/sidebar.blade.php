@@ -125,6 +125,10 @@
                 </button>
 
                 <div x-show="open" x-collapse class="bg-slate-900 pl-12 py-2 space-y-1">
+                    <a href="{{ route('peminjaman.create') }}"
+                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('peminjaman.*') ? 'text-white font-semibold' : 'text-slate-400' }}">
+                        Ajukan Peminjaman
+                    </a>
                     <a href="#"
                         class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('alat.*') ? 'text-white font-semibold' : 'text-slate-400' }}">
                         Data Alat

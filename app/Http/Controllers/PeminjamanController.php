@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alat;
+use App\Models\Laboratorium;
 use App\Models\Peminjaman;
 use App\Models\PeminjamanDetailAlat;
 use App\Models\Pengembalian;
@@ -15,6 +17,86 @@ use Yajra\DataTables\Facades\DataTables;
 class PeminjamanController extends Controller
 {
     private $relations = ['peminjam', 'laboratorium'];
+
+    public function create()
+    {
+        $labs = Laboratorium::where('status', 'aktif')->get();
+
+        $alats = Alat::where('kondisi', 'baik')->with('laboratorium')->get();
+
+        return view('peminjaman.create', compact('labs', 'alats'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'kegiatan' => 'required|string|max:255',
+            'jumlah_peserta' => 'required|integer|min:1',
+            'start_time' => 'required|date|after:now',
+            'end_time' => 'required|date|after:start_time',
+            'id_lab' => 'nullable|exists:laboratorium,id',
+            'alat_ids' => 'nullable|array',
+            'alat_ids.*' => 'exists:alat,id',
+        ]);
+        $conflictErrors = Peminjaman::checkAvailability(
+            $request->id_lab,
+            $request->alat_ids ?? [],
+            $request->start_time,
+            $request->end_time,
+        );
+
+        if ($conflictErrors) {
+            return response()->json([
+                'status' => false,
+                'title' => 'Gagal menyetujui peminjaman.',
+                'message' => 'Beberapa sumber daya tidak tersedia.',
+                'errors' => $conflictErrors,
+            ]);
+        }
+        DB::beginTransaction();
+
+        try {
+            $peminjaman = Peminjaman::create([
+                'id_peminjam' => Auth::id(),
+                'id_lab' => $request->id_lab,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'kegiatan' => $request->kegiatan,
+                'jumlah_peserta' => $request->jumlah_peserta,
+                'status_pengajuan' => 'pending',
+            ]);
+
+            if ($request->has('alat_ids')) {
+                foreach ($request->alat_ids as $alatId) {
+                    $alat = Alat::find($alatId);
+
+                    PeminjamanDetailAlat::create([
+                        'peminjaman_id' => $peminjaman->id,
+                        'id_alat' => $alatId,
+                        'kondisi_saat_pinjam' => $alat->kondisi,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'title' => 'Permohonan Terkirim!',
+                'message' => 'Data peminjaman telah masuk ke sistem kami.',
+                'info' => 'Status saat ini: Menunggu Persetujuan Admin.',
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan: '.$e->getMessage(),
+            ]);
+
+        }
+    }
 
     public function indexValidasi()
     {
