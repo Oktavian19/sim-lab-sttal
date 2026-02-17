@@ -63,7 +63,6 @@
                                     class="min-w-64 px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider w-64 sticky left-0 bg-gray-50 z-20 border-r border-gray-200 shadow-sm">
                                     <span id="resourceHeader">Nama Laboratorium</span>
                                 </th>
-                                <!-- Generasi Header Jam 07:00 - 18:00 -->
                                 <script>
                                     for (let i = 0; i <= 23; i++) {
                                         document.write(
@@ -74,7 +73,6 @@
                             </tr>
                         </thead>
                         <tbody id="schedulerBody" class="divide-y divide-gray-200">
-                            <!-- Rows akan di-generate oleh JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -95,7 +93,7 @@
                     </p>
                 </div>
                 <div class="flex-shrink-0 md:ml-auto self-center">
-                    <a href="peminjaman_user.blade.php"
+                    <a href="{{ route('peminjaman.create') }}"
                         class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors">
                         <i class="fa-solid fa-plus"></i> Buat Pengajuan
                     </a>
@@ -133,7 +131,7 @@
 
         function setViewMode(mode) {
             viewMode = mode;
-            // Update UI Buttons
+
             const btnLab = document.getElementById('btn-lab');
             const btnAlat = document.getElementById('btn-alat');
             const header = document.getElementById('resourceHeader');
@@ -262,9 +260,9 @@
                     } else {
                         tr.innerHTML += `
                             <td class="p-1 h-20 border-r border-gray-100 relative group cursor-pointer hover:bg-blue-50 transition-colors">
-                                <div class="w-full h-full rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                   <i class="fa-solid fa-plus text-blue-400 text-xs"></i>
-                                </div>
+                                <!-- <div class="w-full h-full rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="fa-solid fa-plus text-blue-400 text-xs"></i>
+                                </div> -->
                             </td>`;
                     }
                 });
