@@ -98,6 +98,31 @@ class PeminjamanController extends Controller
         }
     }
 
+    public function schedule()
+    {
+        $labs = Laboratorium::where('status', '!=', 'nonaktif')->get();
+
+        $alats = Alat::where('kondisi', 'baik')->with('laboratorium')->get();
+
+        $peminjamans = Peminjaman::with(['peminjam', 'detailAlat'])
+        ->whereIn('status_pengajuan', ['pending', 'disetujui'])
+        ->get()
+        ->map(function($item) {
+            return [
+                'id' => $item->id,
+                'id_lab' => $item->id_lab,
+                'start_time' => $item->start_time,
+                'end_time' => $item->end_time,
+                'status_pengajuan' => $item->status_pengajuan,
+                'kegiatan' => $item->kegiatan,
+                'peminjam_nama' => $item->peminjam->nama,
+                'alat_dipinjam' => $item->detailAlat->pluck('id_alat')->toArray()
+            ];
+        });
+
+        return view('peminjaman.schedule', compact('labs', 'alats', 'peminjamans'));
+    }
+
     public function indexValidasi()
     {
         return view('peminjaman.validasi.index');

@@ -92,6 +92,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('peminjaman')->name('peminjaman.')->group(function () {
             Route::get('/create', [PeminjamanController::class, 'create'])->name('create');
             Route::post('/store', [PeminjamanController::class, 'store'])->name('store');
+            Route::get('/schedule', [PeminjamanController::class, 'schedule'])->name('schedule');
         });
     });
 });

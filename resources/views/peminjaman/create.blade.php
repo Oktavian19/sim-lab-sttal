@@ -220,9 +220,10 @@
         $(document).ready(function() {
             const startPicker = flatpickr("#start_time", {
                 enableTime: true,
-                dateFormat: "Y-m-d H:i:s",
+                enableMinutes: false,
+                dateFormat: "Y-m-d H:00:00",
                 altInput: true,
-                altFormat: "l, d F Y H:i",
+                altFormat: "l, d F Y H:00",
                 time_24hr: true,
                 locale: "id",
                 minDate: "today",
@@ -235,9 +236,10 @@
 
             const endPicker = flatpickr("#end_time", {
                 enableTime: true,
-                dateFormat: "Y-m-d H:i:s",
+                enableMinutes: false,
+                dateFormat: "Y-m-d H:00:00",
                 altInput: true,
-                altFormat: "l, d F Y H:i",
+                altFormat: "l, d F Y H:00",
                 time_24hr: true,
                 locale: "id",
                 minDate: "today",
@@ -248,7 +250,7 @@
 
             $.validator.addMethod("greaterThan", function(value, element, param) {
                 var startDate = $(param).val();
-                if (!value || !startDate) return true; // Biarkan required rule yang menangani field kosong
+                if (!value || !startDate) return true; 
                 return new Date(value) > new Date(startDate);
             }, "Waktu selesai harus setelah waktu mulai.");
 

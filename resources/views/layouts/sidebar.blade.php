@@ -140,9 +140,9 @@
                 </div>
             </div>
 
-            <a href="#" class="{{ request()->routeIs('katalog.*') ? $activeClass : $inactiveClass }}">
+            <a href="{{ route('peminjaman.schedule') }}" class="{{ request()->routeIs('peminjaman.*') ? $activeClass : $inactiveClass }}">
                 <i class="fa-solid fa-list-check w-6 group-hover:text-blue-400 transition-colors"></i>
-                <span class="text-sm font-medium">Katalog & Stok</span>
+                <span class="text-sm font-medium">Jadwal Peminjaman</span>
             </a>
 
             <p class="px-6 mt-6 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Pusat Bantuan</p>
