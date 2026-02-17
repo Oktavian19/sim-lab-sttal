@@ -152,7 +152,7 @@
                 <span class="text-sm font-medium">Lapor Kerusakan</span>
             </a>
 
-            <a href="#" class="{{ request()->routeIs('riwayat.*') ? $activeClass : $inactiveClass }}">
+            <a href="{{ route('peminjaman.riwayatUser') }}" class="{{ request()->routeIs('riwayat.*') ? $activeClass : $inactiveClass }}">
                 <i class="fa-solid fa-clock-rotate-left w-6 group-hover:text-yellow-400 transition-colors"></i>
                 <span class="text-sm font-medium">Riwayat Transaksi</span>
             </a>

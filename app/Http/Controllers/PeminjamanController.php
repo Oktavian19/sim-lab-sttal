@@ -105,22 +105,82 @@ class PeminjamanController extends Controller
         $alats = Alat::where('kondisi', 'baik')->with('laboratorium')->get();
 
         $peminjamans = Peminjaman::with(['peminjam', 'detailAlat'])
-        ->whereIn('status_pengajuan', ['pending', 'disetujui'])
-        ->get()
-        ->map(function($item) {
-            return [
-                'id' => $item->id,
-                'id_lab' => $item->id_lab,
-                'start_time' => $item->start_time,
-                'end_time' => $item->end_time,
-                'status_pengajuan' => $item->status_pengajuan,
-                'kegiatan' => $item->kegiatan,
-                'peminjam_nama' => $item->peminjam->nama,
-                'alat_dipinjam' => $item->detailAlat->pluck('id_alat')->toArray()
-            ];
-        });
+            ->whereIn('status_pengajuan', ['pending', 'disetujui'])
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'id_lab' => $item->id_lab,
+                    'start_time' => $item->start_time,
+                    'end_time' => $item->end_time,
+                    'status_pengajuan' => $item->status_pengajuan,
+                    'kegiatan' => $item->kegiatan,
+                    'peminjam_nama' => $item->peminjam->nama,
+                    'alat_dipinjam' => $item->detailAlat->pluck('id_alat')->toArray(),
+                ];
+            });
 
         return view('peminjaman.schedule', compact('labs', 'alats', 'peminjamans'));
+    }
+
+    public function riwayatUser(Request $request)
+    {
+        $userId = Auth::id();
+
+        $query = Peminjaman::with('laboratorium')
+            ->where('id_peminjam', $userId);
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            if ($request->status === 'selesai') {
+                $query->whereIn('status_pengajuan', ['selesai', 'ditolak', 'dibatalkan']);
+            } else {
+                $query->where('status_pengajuan', $request->status);
+            }
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('kegiatan', 'like', "%{$search}%")
+                    ->orWhereHas('laboratorium', function ($lab) use ($search) {
+                        $lab->where('nama_lab', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $peminjaman = $query->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        if ($request->ajax()) {
+            return view('peminjaman.riwayat.user.list', compact('peminjaman'))->render();
+        }
+
+        return view('peminjaman.riwayat.user.index', compact('peminjaman'));
+    }
+
+    public function showRiwayatUser($id)
+    {
+        $peminjaman = Peminjaman::with(['laboratorium', 'detailAlat', 'pengembalian'])->findOrFail($id);
+
+        return view('peminjaman.riwayat.user.show', compact('peminjaman'));
+    }
+
+    public function cancel($id)
+    {
+        $peminjaman = Peminjaman::where('id', $id)
+            ->where('id_peminjam', Auth::id())
+            ->firstOrFail();
+
+        if ($peminjaman->status_pengajuan !== 'pending') {
+            return back()->with('error', 'Pengajuan tidak dapat dibatalkan.');
+        }
+
+        $peminjaman->update([
+            'status_pengajuan' => 'dibatalkan',
+        ]);
+
+        return back()->with('success', 'Pengajuan berhasil dibatalkan.');
     }
 
     public function indexValidasi()

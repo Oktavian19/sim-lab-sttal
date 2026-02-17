@@ -93,6 +93,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/create', [PeminjamanController::class, 'create'])->name('create');
             Route::post('/store', [PeminjamanController::class, 'store'])->name('store');
             Route::get('/schedule', [PeminjamanController::class, 'schedule'])->name('schedule');
+            Route::get('/riwayat', [PeminjamanController::class, 'riwayatUser'])->name('riwayatUser');
+            Route::get('/riwayat/show/{id}', [PeminjamanController::class, 'showRiwayatUser'])->name('riwayatUser.show');
+            Route::post('/cancel/{id}', [PeminjamanController::class, 'cancel'])->name('cancel');
         });
     });
 });
