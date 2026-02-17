@@ -326,37 +326,12 @@
                     if (res.status) {
                         hideModal();
 
-                        Swal.fire({
+                                                Swal.fire({
                             icon: 'success',
-                            title: res.title ?? 'Berhasil',
-                            html: `
-                                <div style="font-family: sans-serif;">
-                                    <p style="color: #4b5563; font-size: 1.1em; margin-bottom: 15px;">
-                                        ${res.message}
-                                    </p>
-                                    
-                                    <div style="
-                                        background-color: #ecfdf5; 
-                                        border: 1px solid #10b981; 
-                                        border-radius: 8px; 
-                                        padding: 12px;
-                                        margin-top: 10px;
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: center;
-                                        gap: 10px;
-                                    ">
-                                        <span style="font-size: 1.5em;">⏳</span>
-                                        <div style="text-align: left;">
-                                            <span style="display: block; font-size: 0.85em; color: #047857; font-weight: 600;">STATUS SELANJUTNYA</span>
-                                            <span style="color: #065f46; font-weight: 500;">Menunggu Persetujuan Admin</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            `,
-                            timer: 3000, 
-                            timerProgressBar: true, 
-                            showConfirmButton: false,
+                            title: 'Berhasil',
+                            text: res.message,
+                            timer: 2000,
+                            showConfirmButton: false
                         });
 
                         document.getElementById('loanForm').reset();
@@ -418,7 +393,6 @@
                                         max-height: 250px; 
                                         overflow-y: auto; 
                                         padding-right: 5px;
-                                        /* Custom Scrollbar styling untuk webkit */
                                         scrollbar-width: thin;
                                         scrollbar-color: #cbd5e1 transparent;
                                     ">

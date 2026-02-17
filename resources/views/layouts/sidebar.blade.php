@@ -91,15 +91,15 @@
 
                 <div x-show="open" x-collapse class="bg-slate-900 pl-12 py-2 space-y-1">
                     <a href="{{ route('peminjaman.validasi') }}"
-                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('validasi.*') ? 'text-white font-semibold' : 'text-slate-400' }}">
+                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('peminjaman.validasi') ? 'text-white font-semibold' : 'text-slate-400' }}">
                         Validasi Peminjaman
                     </a>
                     <a href="{{ route('peminjaman.monitoring') }}"
-                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('monitoring.*') ? 'text-white font-semibold' : 'text-slate-400' }}">
+                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('peminjaman.monitoring') ? 'text-white font-semibold' : 'text-slate-400' }}">
                         Monitoring Peminjaman
                     </a>
                     <a href="{{ route('peminjaman.riwayat') }}"
-                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('riwayat.*') ? 'text-white font-semibold' : 'text-slate-400' }}">
+                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('peminjaman.riwayat') ? 'text-white font-semibold' : 'text-slate-400' }}">
                         Riwayat Peminjaman
                     </a>
                 </div>
@@ -113,7 +113,7 @@
         @else
             <p class="px-6 mt-6 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Layanan Laboratorium</p>
 
-            @php $isUserBookingOpen = request()->routeIs('alat.*') || request()->routeIs('laboratorium.*'); @endphp
+            @php $isUserBookingOpen = request()->routeIs('peminjaman.*'); @endphp
             <div x-data="{ open: {{ $isUserBookingOpen ? 'true' : 'false' }} }" @click.outside="open = false">
                 <button @click="open = !open"
                     class="w-full flex items-center px-6 py-2.5 transition-colors group {{ $isUserBookingOpen ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
@@ -125,24 +125,29 @@
                 </button>
 
                 <div x-show="open" x-collapse class="bg-slate-900 pl-12 py-2 space-y-1">
+                    <a href="{{ route('peminjaman.schedule') }}"
+                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('peminjaman.schedule') ? 'text-white font-semibold' : 'text-slate-400' }}">
+                        Jadwal Peminjaman
+                    </a>
                     <a href="{{ route('peminjaman.create') }}"
-                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('peminjaman.*') ? 'text-white font-semibold' : 'text-slate-400' }}">
+                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('peminjaman.create') ? 'text-white font-semibold' : 'text-slate-400' }}">
                         Ajukan Peminjaman
                     </a>
-                    <a href="#"
-                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('alat.*') ? 'text-white font-semibold' : 'text-slate-400' }}">
-                        Data Alat
-                    </a>
-                    <a href="#"
-                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('laboratorium.*') ? 'text-white font-semibold' : 'text-slate-400' }}">
-                        Data Laboratorium
+                    <a href="{{ route('peminjaman.riwayatUser') }}"
+                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('peminjaman.riwayatUser') ? 'text-white font-semibold' : 'text-slate-400' }}">
+                        Riwayat Peminjaman
                     </a>
                 </div>
             </div>
 
-            <a href="{{ route('peminjaman.schedule') }}" class="{{ request()->routeIs('peminjaman.*') ? $activeClass : $inactiveClass }}">
+            <a href="#" class="{{ request()->routeIs('alat.*') ? $activeClass : $inactiveClass }}">
                 <i class="fa-solid fa-list-check w-6 group-hover:text-blue-400 transition-colors"></i>
-                <span class="text-sm font-medium">Jadwal Peminjaman</span>
+                <span class="text-sm font-medium">Data Alat</span>
+            </a>
+
+            <a href="#" class="{{ request()->routeIs('laboratorium.*') ? $activeClass : $inactiveClass }}">
+                <i class="fa-solid fa-list-check w-6 group-hover:text-blue-400 transition-colors"></i>
+                <span class="text-sm font-medium">Data Laboratorium</span>
             </a>
 
             <p class="px-6 mt-6 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Pusat Bantuan</p>
@@ -150,11 +155,6 @@
             <a href="#" class="{{ request()->routeIs('laporan.*') ? $activeClass : $inactiveClass }}">
                 <i class="fa-solid fa-triangle-exclamation w-6 group-hover:text-red-400 transition-colors"></i>
                 <span class="text-sm font-medium">Lapor Kerusakan</span>
-            </a>
-
-            <a href="{{ route('peminjaman.riwayatUser') }}" class="{{ request()->routeIs('riwayat.*') ? $activeClass : $inactiveClass }}">
-                <i class="fa-solid fa-clock-rotate-left w-6 group-hover:text-yellow-400 transition-colors"></i>
-                <span class="text-sm font-medium">Riwayat Transaksi</span>
             </a>
         @endif
     </nav>

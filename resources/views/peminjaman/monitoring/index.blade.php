@@ -10,12 +10,6 @@
 
             <div class="flex flex-col md:flex-row justify-between items-center p-6 border-b border-slate-200 gap-4">
                 <h5 class="text-lg font-semibold text-slate-700">Peminjaman yang sedang Dipantau</h5>
-
-                {{-- <button class="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg shadow-md transition-colors"
-                    onclick="modalAction('{{ url('laboratorium/create') }}')">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Tambah Laboratorium</span>
-                </button> --}}
             </div>
 
             <div class="p-6">

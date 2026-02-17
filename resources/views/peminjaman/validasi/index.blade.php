@@ -10,12 +10,6 @@
 
             <div class="flex flex-col md:flex-row justify-between items-center p-6 border-b border-slate-200 gap-4">
                 <h5 class="text-lg font-semibold text-slate-700">Peminjaman yang perlu Validasi</h5>
-
-                {{-- <button class="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg shadow-md transition-colors"
-                    onclick="modalAction('{{ url('laboratorium/create') }}')">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Tambah Laboratorium</span>
-                </button> --}}
             </div>
 
             <div class="p-6">
@@ -72,8 +66,7 @@
                     }
                 },
 
-                columns: [
-                    {
+                columns: [{
                         data: 'tanggal_pengajuan',
                         name: 'tanggal_pengajuan',
                         className: 'px-4 py-3'
@@ -82,7 +75,7 @@
                         data: 'peminjam',
                         name: 'peminjam',
                         className: 'px-4 py-3'
-                    },                    
+                    },
                     {
                         data: 'rencana_pinjam',
                         name: 'rencana_pinjam',
@@ -142,17 +135,58 @@
                         });
                         table.ajax.reload(null, false);
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.title || 'Gagal',
-                            text: res.message
-                        });
-                        if (res.errors) {
-                            $('.error-text').text('');
-                            $.each(res.errors, function(field, messages) {
-                                $('#error-' + field).text(messages[0]);
-                            });
+                        let errorListHtml = '';
+
+                        if (res.errors && Array.isArray(res.errors)) {
+                            errorListHtml = res.errors.map(err => `
+                            <div style="
+                                background-color: #fef2f2; 
+                                border-left: 5px solid #ef4444; 
+                                padding: 12px; 
+                                margin-bottom: 8px; 
+                                border-radius: 4px; 
+                                display: flex; 
+                                align-items: start;
+                                font-size: 0.95em;
+                            ">
+                                <div style="color: #ef4444; margin-right: 10px; font-weight: bold; font-size: 1.1em;">
+                                    •
+                                </div>
+                                <div style="color: #7f1d1d; line-height: 1.4;">
+                                    ${err}
+                                </div>
+                            </div>
+                        `).join('');
                         }
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: res.title ??
+                                'Jadwal Bentrok',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'Cek Jadwal Kembali',
+                            width: '32rem',
+                            html: `
+                                <div style="text-align: left; font-family: sans-serif;">
+                                    <p style="margin-bottom: 15px; color: #4b5563; font-size: 1.05em;">
+                                        ${res.message}
+                                    </p>
+                                    
+                                    <div style="
+                                        max-height: 250px; 
+                                        overflow-y: auto; 
+                                        padding-right: 5px;
+                                        scrollbar-width: thin;
+                                        scrollbar-color: #cbd5e1 transparent;
+                                    ">
+                                        ${errorListHtml}
+                                    </div>
+                                </div>
+                            `,
+                            didOpen: () => {
+                                Swal.getConfirmButton().blur();
+                            }
+                        });
                     }
                 },
                 error: function(xhr) {

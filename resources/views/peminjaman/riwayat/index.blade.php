@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Peminjaman - SIM LAB STTAL Admin')
-@section('header', 'Validasi Peminjaman')
+@section('header', 'Riwayat Peminjaman')
 
 @section('content')
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
@@ -9,23 +9,18 @@
         <div class="bg-white rounded-lg shadow-md border border-slate-200">
 
             <div class="flex flex-col md:flex-row justify-between items-center p-6 border-b border-slate-200 gap-4">
-                <h5 class="text-lg font-semibold text-slate-700">Peminjaman yang perlu Validasi</h5>
-
-                {{-- <button class="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg shadow-md transition-colors"
-                    onclick="modalAction('{{ url('laboratorium/create') }}')">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Tambah Laboratorium</span>
-                </button> --}}
+                <h5 class="text-lg font-semibold text-slate-700">Peminjaman yang telah selesai</h5>
             </div>
 
             <div class="p-6">
                 <table id="inventoryTable" class="w-full text-sm text-left text-slate-500 display" style="width:100%">
                     <thead class="text-xs text-slate-700 uppercase bg-slate-50">
                         <tr>
-                            <th class="px-4 py-3">Tanggal Peminjaman</th>
-                            <th class="px-4 py-3">Tanggal Kembali</th>
+                            <th class="px-4 py-3 rounded-tl-lg">No</th>
                             <th class="px-4 py-3">Peminjam</th>
                             <th class="px-4 py-3">Kegiatan</th>
+                            <th class="px-4 py-3">Tanggal Peminjaman</th>
+                            <th class="px-4 py-3">Tanggal Kembali</th>
                             <th class="px-4 py-3">Status Pengembalian</th>
                             <th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th>
                         </tr>
@@ -72,15 +67,13 @@
                     }
                 },
 
-                columns: [{
-                        data: 'tanggal_peminjaman',
-                        name: 'tanggal_peminjaman',
-                        className: 'px-4 py-3'
-                    },
+                columns: [
                     {
-                        data: 'tanggal_kembali',
-                        name: 'tanggal_kembali',
-                        className: 'px-4 py-3'
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        className: 'px-4 py-3 text-center',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'peminjam',
@@ -93,8 +86,18 @@
                         className: 'px-4 py-3'
                     },
                     {
-                        data: 'status_pengembalian',
-                        name: 'status_pengembalian',
+                        data: 'tanggal_peminjaman',
+                        name: 'tanggal_peminjaman',
+                        className: 'px-4 py-3'
+                    },
+                    {
+                        data: 'tanggal_kembali',
+                        name: 'tanggal_kembali',
+                        className: 'px-4 py-3'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
                         className: 'px-4 py-3'
                     },
                     {

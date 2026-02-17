@@ -123,7 +123,8 @@
 
                                     <td class="px-6 py-4">
                                         <div class="font-medium text-slate-900">{{ $item->kegiatan }}</div>
-                                        <div class="text-xs text-slate-400">{{ $item->laboratorium->nama_lab }}</div>
+                                        <div class="text-xs text-slate-400">
+                                            {{ $item->laboratorium->nama_lab ?? 'Hanya peminjaman alat' }}</div>
                                     </td>
 
                                     <td class="px-6 py-4">
@@ -159,11 +160,26 @@
                         @foreach ($lab['labData'] as $item)
                             @php
                                 $isSedangDipakai = in_array($item->id, $lab['active_lab_ids']);
-                                $statusClass = $isSedangDipakai
-                                    ? 'bg-red-50 border-red-500'
-                                    : 'bg-green-50 border-green-500';
-                                $statusText = $isSedangDipakai ? 'Sedang Digunakan' : 'Tersedia';
+
+                                if ($item->status === 'nonaktif') {
+                                    $statusClass = 'bg-gray-50 border-gray-500';
+                                    $badgeClass = 'text-gray-700 bg-gray-200';
+                                    $statusText = 'Nonaktif';
+                                } elseif ($item->status === 'perbaikan') {
+                                    $statusClass = 'bg-yellow-50 border-yellow-500';
+                                    $badgeClass = 'text-yellow-700 bg-yellow-200';
+                                    $statusText = 'Perbaikan';
+                                } elseif ($isSedangDipakai) {
+                                    $statusClass = 'bg-red-50 border-red-500';
+                                    $badgeClass = 'text-red-700 bg-red-200';
+                                    $statusText = 'Sedang Digunakan';
+                                } else {
+                                    $statusClass = 'bg-green-50 border-green-500';
+                                    $badgeClass = 'text-green-700 bg-green-200';
+                                    $statusText = 'Tersedia';
+                                }
                             @endphp
+
 
                             <div class="flex items-center justify-between p-2 rounded border-l-4 mb-2 {{ $statusClass }}">
                                 <div>
@@ -176,8 +192,7 @@
                                     @endif
                                 </div>
 
-                                <span
-                                    class="text-xs font-bold px-2 py-1 rounded {{ $isSedangDipakai ? 'text-red-700 bg-red-200' : 'text-green-700 bg-green-200' }}">
+                                <span class="text-xs font-bold px-2 py-1 rounded {{ $badgeClass }}">
                                     {{ $statusText }}
                                 </span>
                             </div>

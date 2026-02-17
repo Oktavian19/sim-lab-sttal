@@ -27,7 +27,7 @@ class DashboardController extends Controller
                 ];
                 $peminjaman = [
                     'validasi' => Peminjaman::where('status_pengajuan', 'pending')->count(),
-                    'validasiData' => Peminjaman::where('status_pengajuan', 'pending')->get(),
+                    'validasiData' => Peminjaman::with('laboratorium')->where('status_pengajuan', 'pending')->limit(6)->orderBy('start_time', 'asc')->get(),
                 ];
                 $activeLoans = Peminjaman::where('status_pengajuan', 'disetujui')
                     ->where('start_time', '<=', $now)

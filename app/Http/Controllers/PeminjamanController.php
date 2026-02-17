@@ -240,7 +240,7 @@ class PeminjamanController extends Controller
             ->addColumn('kegiatan', function ($peminjaman) {
                 return '
                 <div class="font-medium text-slate-900">'.$peminjaman->kegiatan.'</div>
-                <div class="text-xs text-slate-400">'.$peminjaman->laboratorium->nama_lab.'</div>
+                <div class="text-xs text-slate-400">'.($peminjaman->laboratorium ? $peminjaman->laboratorium->nama_lab : 'Hanya peminjaman alat').'</div>
                 ';
             })
             ->addColumn('jumlah_peserta', function ($peminjaman) {
@@ -289,7 +289,8 @@ class PeminjamanController extends Controller
             return response()->json([
                 'status' => false,
                 'title' => 'Gagal menyetujui peminjaman.',
-                'message' => $conflictErrors,
+                'message' => 'Beberapa sumber daya tidak tersedia.',
+                'errors' => $conflictErrors,
             ]);
         }
 
@@ -361,7 +362,7 @@ class PeminjamanController extends Controller
             ->addColumn('kegiatan', function ($peminjaman) {
                 return '
                 <div class="font-medium text-slate-900">'.$peminjaman->kegiatan.'</div>
-                <div class="text-xs text-slate-400">'.$peminjaman->laboratorium->nama_lab.'</div>
+                <div class="text-xs text-slate-400">'.($peminjaman->laboratorium ? $peminjaman->laboratorium->nama_lab : 'Hanya peminjaman alat').'</div>
                 ';
             })
             ->addColumn('jumlah_peserta', function ($peminjaman) {
@@ -466,20 +467,32 @@ class PeminjamanController extends Controller
     public function listRiwayat()
     {
         $peminjaman = Peminjaman::with($this->relations)
-            ->where('status_pengajuan', 'selesai')
+            ->whereIn('status_pengajuan', ['selesai', 'ditolak', 'dibatalkan'])
             ->orderBy('start_time', 'desc')
             ->get();
 
         return DataTables::of($peminjaman)
             ->addIndexColumn()
             ->addColumn('tanggal_peminjaman', function ($peminjaman) {
-                return '
+                $html = '
                 <div class="font-medium text-slate-900">'.$peminjaman->start_time->translatedFormat('d F Y').'</div>
-                <div class="text-xs text-slate-400">'.$peminjaman->start_time->translatedFormat('H:i').'</div>
 
                 ';
+
+                $daysDiff = (int) $peminjaman->start_time->diffInDays($peminjaman->end_time);
+                if ($daysDiff > 0) {
+                    $html .= '<div class="text-xs text-slate-400">'.$daysDiff.' Hari</div>';
+                } else {
+                    $html .= '<div class="text-xs text-slate-400">'.$peminjaman->start_time->translatedFormat('H:i').' - '.$peminjaman->end_time->translatedFormat('H:i').'</div>';
+                }
+
+                return $html;
             })
             ->addColumn('tanggal_kembali', function ($peminjaman) {
+                if ($peminjaman->status_pengajuan != 'selesai') {
+                    return '<span class="text-xs text-slate-400">Peminjaman tidak selesai</span>';
+                }
+
                 return '
                 <div class="font-medium text-slate-900">'.$peminjaman->pengembalian->tanggal_kembali_realisasi->translatedFormat('d F Y').'</div>
                 <div class="text-xs text-slate-400">'.$peminjaman->pengembalian->tanggal_kembali_realisasi->translatedFormat('H:i').'</div>
@@ -494,30 +507,46 @@ class PeminjamanController extends Controller
             ->addColumn('kegiatan', function ($peminjaman) {
                 return '
                 <div class="font-medium text-slate-900">'.$peminjaman->kegiatan.'</div>
-                <div class="text-xs text-slate-400">'.$peminjaman->laboratorium->nama_lab.'</div>
+                <div class="text-xs text-slate-400">'.($peminjaman->laboratorium ? $peminjaman->laboratorium->nama_lab : 'Hanya peminjaman alat').'</div>
                 ';
             })
-            ->addColumn('status_pengembalian', function ($peminjaman) {
-                $baseClass = 'text-xs font-medium px-2.5 py-0.5 rounded border';
+            ->addColumn('status', function ($peminjaman) {
 
-                if ($peminjaman->status_pengembalian === 'terlambat') {
-                    return '<span class="'.$baseClass.' bg-red-100 text-red-800 border-red-200">Terlambat</span>';
-                } else {
-                    return '<span class="'.$baseClass.' bg-green-100 text-green-800 border-green-200">Tepat Waktu</span>';
-                }
+                $baseClass = 'text-xs font-medium px-2.5 py-0.5 rounded border ';
+
+                $statusMap = [
+                    'selesai' => 'bg-green-100 text-green-800 border-green-200',
+                    'dibatalkan' => 'bg-red-100 text-red-800 border-red-200',
+                    'ditolak' => 'bg-red-100 text-red-800 border-red-200',
+                ];
+
+                $status = $peminjaman->status_pengajuan;
+
+                $class = $statusMap[$status] ?? 'bg-gray-100 text-gray-800 border-gray-200';
+
+                return '<span class="'.$baseClass.$class.'">'
+                        .ucfirst($status).
+                       '</span>';
             })
-
             ->addColumn('aksi', function ($peminjaman) {
                 return '
             <div class="flex items-center justify-center gap-3">
-                <a href="/peminjaman/'.$peminjaman->id.'/showValidasi" onclick="modalAction(this.href); return false;"
-                    class="bg-blue-600 text-white hover:bg-blue-700 bg-slate-100 p-2 rounded-md">
-                    <i class="fa-solid fa-magnifying-glass"></i> Validasi
+                <a href="/peminjaman/'.$peminjaman->id.'/showRiwayat" onclick="modalAction(this.href); return false;"
+                    class="text-slate-500 hover:text-blue-600 bg-slate-100 p-2 rounded-md">
+                    <i class="fa-solid fa-eye"></i> Detail
                 </a>
             </div>
             ';
             })
-            ->rawColumns(['tanggal_peminjaman', 'tanggal_kembali', 'peminjam', 'kegiatan', 'status_pengembalian', 'aksi'])
+            ->rawColumns(['tanggal_peminjaman', 'tanggal_kembali', 'peminjam', 'kegiatan', 'status', 'aksi'])
             ->make(true);
+    }
+
+    public function showRiwayat($id)
+    {
+        $peminjaman = Peminjaman::with('pengembalian')->findOrFail($id);
+        $detailAlat = PeminjamanDetailAlat::where('peminjaman_id', $id)->with('alat.laboratorium')->get();
+
+        return view('peminjaman.riwayat.show', compact('peminjaman', 'detailAlat'));
     }
 }

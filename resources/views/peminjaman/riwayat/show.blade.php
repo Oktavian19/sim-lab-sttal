@@ -146,4 +146,122 @@
                 {{ $peminjaman->catatan_admin ?? 'Tidak ada catatan' }}</textarea>
             </div>
         </div>
+
+        {{-- BAGIAN PENGEMBALIAN --}}
+        @if ($peminjaman->pengembalian)
+            <div>
+                <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2 flex items-center gap-2">
+                    Informasi Pengembalian
+                    @if ($peminjaman->pengembalian->status_pengembalian === 'terlambat')
+                        <span
+                            class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-600 uppercase border border-red-200">Terlambat</span>
+                    @endif
+                </h3>
+
+                @php
+                    $isLate = $peminjaman->pengembalian->status_pengembalian === 'terlambat';
+
+                    // Config warna berdasarkan status
+                    $theme = $isLate
+                        ? [
+                            'bg' => 'bg-red-50',
+                            'border' => 'border-red-200',
+                            'text' => 'text-red-700',
+                            'icon' => 'fa-circle-exclamation',
+                            'icon_color' => 'text-red-500',
+                        ]
+                        : [
+                            'bg' => 'bg-emerald-50',
+                            'border' => 'border-emerald-200',
+                            'text' => 'text-emerald-700',
+                            'icon' => 'fa-circle-check',
+                            'icon_color' => 'text-emerald-500',
+                        ];
+                @endphp
+
+                <div class="rounded-xl border {{ $theme['border'] }} {{ $theme['bg'] }} overflow-hidden">
+                    <div class="p-5">
+                        <div class="flex flex-col md:flex-row gap-6">
+
+                            {{-- Kolom Kiri: Ikon Besar & Status Utama --}}
+                            <div
+                                class="flex-shrink-0 flex md:flex-col items-center md:justify-center gap-3 md:w-24 md:border-r {{ $isLate ? 'border-red-200' : 'border-emerald-200' }} md:pr-4">
+                                <i class="fa-solid {{ $theme['icon'] }} text-4xl {{ $theme['icon_color'] }}"></i>
+                                <div class="text-center">
+                                    <span
+                                        class="block text-xs font-bold uppercase tracking-wider {{ $theme['text'] }}">Status</span>
+                                    <span class="block font-semibold text-sm text-gray-700 mt-0.5">
+                                        {{ $isLate ? 'Terlambat' : 'Selesai' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {{-- Kolom Kanan: Detail Grid --}}
+                            <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+
+                                {{-- Waktu Kembali --}}
+                                <div>
+                                    <p class="text-gray-500 text-xs font-semibold uppercase tracking-wider">Waktu
+                                        Dikembalikan</p>
+                                    <p class="text-gray-900 font-medium mt-1 text-base">
+                                        {{ $peminjaman->pengembalian->tanggal_kembali_realisasi->translatedFormat('d F Y') }}
+                                    </p>
+                                    <p class="text-gray-500 text-sm flex items-center gap-1.5">
+                                        <i class="fa-regular fa-clock text-xs"></i>
+                                        {{ $peminjaman->pengembalian->tanggal_kembali_realisasi->format('H:i') }} WIB
+                                    </p>
+                                </div>
+
+                                {{-- Petugas Verifikator --}}
+                                <div>
+                                    <p class="text-gray-500 text-xs font-semibold uppercase tracking-wider">Diverifikasi
+                                        Oleh</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <div
+                                            class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                        <p class="text-gray-900 font-medium text-sm">
+                                            {{ $peminjaman->pengembalian->petugas->nama ?? 'Admin / Petugas' }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {{-- Catatan --}}
+                                <div class="md:col-span-2">
+                                    <p class="text-gray-500 text-xs font-semibold uppercase tracking-wider">Catatan
+                                        Pengembalian</p>
+                                    @if ($peminjaman->pengembalian->catatan)
+                                        <p
+                                            class="text-gray-700 text-sm mt-1 bg-white/60 p-2 rounded border {{ $isLate ? 'border-red-100' : 'border-emerald-100' }}">
+                                            "{{ $peminjaman->pengembalian->catatan }}"
+                                        </p>
+                                    @else
+                                        <p class="text-gray-400 text-sm italic mt-1">- Tidak ada catatan -</p>
+                                    @endif
+                                </div>
+
+                                {{-- Denda (Hanya muncul jika ada) --}}
+                                @if ($peminjaman->pengembalian->denda_atau_sanksi)
+                                    <div class="md:col-span-2 mt-1">
+                                        <div
+                                            class="rounded-md bg-red-100 border border-red-200 p-3 flex items-start gap-3">
+                                            <i class="fa-solid fa-triangle-exclamation text-red-600 mt-0.5"></i>
+                                            <div>
+                                                <p class="text-xs font-bold text-red-800 uppercase tracking-wide">Denda
+                                                    / Sanksi Diterapkan</p>
+                                                <p class="text-sm text-red-700 mt-1 font-medium">
+                                                    {{ $peminjaman->pengembalian->denda_atau_sanksi }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>

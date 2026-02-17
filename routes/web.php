@@ -75,8 +75,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('{id}/editMonitoring', [PeminjamanController::class, 'editMonitoring'])->name('editMonitoring');
             Route::post('/{id}/kembali', [PeminjamanController::class, 'prosesPengembalian'])->name('kembali');
 
-            Route::get('/riwayat', [PeminjamanController::class, 'indexRiwayat'])->name('riwayat');
+            Route::get('/riwayat-admin', [PeminjamanController::class, 'indexRiwayat'])->name('riwayat');
             Route::get('/listRiwayat', [PeminjamanController::class, 'listRiwayat'])->name('listRiwayat');
+            Route::get('{id}/showRiwayat', [PeminjamanController::class, 'showRiwayat'])->name('showRiwayat');
+
         });
 
         // Laporan Routes

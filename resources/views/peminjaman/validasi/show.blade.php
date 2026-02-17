@@ -49,32 +49,44 @@
                     Laboratorium Diajukan
                 </h3>
 
-                <div class="flex items-start gap-3">
-                    <div class="flex-shrink-0">
-                        <div class="h-10 w-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
-                            <i class="fa-solid fa-building-columns text-lg"></i>
+                @if ($peminjaman->laboratorium)
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0">
+                            <div
+                                class="h-10 w-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                                <i class="fa-solid fa-building-columns text-lg"></i>
+                            </div>
+                        </div>
+
+                        <div class="flex-1">
+                            <p class="text-gray-900 font-semibold text-base leading-tight">
+                                {{ $peminjaman->laboratorium->nama_lab }}
+                            </p>
+
+                            <div class="mt-1.5 flex items-center">
+                                <span
+                                    class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-gray-50 text-gray-700 border border-gray-100">
+                                    <i class="fa-solid fa-building text-[10px]"></i>
+                                    Kapasitas: {{ $peminjaman->laboratorium->kapasitas }} Orang
+                                </span>
+                                <span
+                                    class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                    <i class="fa-solid fa-users text-[10px]"></i>
+                                    Peserta: {{ $peminjaman->jumlah_peserta }} Orang
+                                </span>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="flex-1">
-                        <p class="text-gray-900 font-semibold text-base leading-tight">
-                            {{ $peminjaman->laboratorium->nama_lab }}
-                        </p>
-
-                        <div class="mt-1.5 flex items-center">
-                            <span
-                                class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-gray-50 text-gray-700 border border-gray-100">
-                                <i class="fa-solid fa-building text-[10px]"></i>
-                                Kapasitas: {{ $peminjaman->laboratorium->kapasitas }} Orang
-                            </span>
-                            <span
-                                class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                                <i class="fa-solid fa-users text-[10px]"></i>
-                                Peserta: {{ $peminjaman->jumlah_peserta }} Orang
-                            </span>
+                @else
+                    <div
+                        class="flex flex-col items-center justify-center py-8 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
+                        <div class="p-3 bg-white rounded-full shadow-sm mb-3">
+                            <i class="fa-solid fa-box-open text-2xl text-gray-400"></i>
                         </div>
+                        <p class="text-gray-500 font-medium text-sm">Tidak ada laboratorium yang diajukan</p>
+                        <p class="text-gray-400 text-xs mt-1">Peminjaman ini hanya untuk alat</p>
                     </div>
-                </div>
+                @endif
             </div>
             <div>
                 <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">Daftar Alat Diajukan</h3>
@@ -102,10 +114,10 @@
                                         </td>
                                         <td class="px-4 py-3 text-center">
                                             @php
-                                                $badge = match ($detail->alat->status_kondisi) {
+                                                $badge = match ($detail->alat->kondisi) {
                                                     'baik' => ['color' => 'green', 'label' => 'Baik'],
-                                                    'rusak_ringan' => ['color' => 'yellow', 'label' => 'Rusak Ringan'],
-                                                    'rusak_berat' => ['color' => 'red', 'label' => 'Rusak Berat'],
+                                                    'maintenance' => ['color' => 'yellow', 'label' => 'Maintenance'],
+                                                    'rusak' => ['color' => 'red', 'label' => 'Rusak'],
                                                     default => ['color' => 'gray', 'label' => '-'],
                                                 };
                                             @endphp
@@ -133,7 +145,8 @@
 
             <div>
                 <label for="catatan_admin" class="block text-sm font-medium text-gray-700 mb-1">
-                    Catatan Admin / Alasan Penolakan <span class="text-red-500 text-xs hidden" id="req-label">*Wajib jika ditolak</span>
+                    Catatan Admin / Alasan Penolakan <span class="text-red-500 text-xs hidden" id="req-label">*Wajib
+                        jika ditolak</span>
                 </label>
                 <textarea name="catatan_admin" id="catatan_admin" rows="3"
                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
@@ -150,7 +163,7 @@
                 </button>
 
                 <button type="button"
-                onclick="submitValidation('{{ route('peminjaman.approve', $peminjaman->id) }}', 'approve')"
+                    onclick="submitValidation('{{ route('peminjaman.approve', $peminjaman->id) }}', 'approve')"
                     class="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all">
                     <i class="fa-solid fa-check mr-2"></i> Setujui Peminjaman
                 </button>
