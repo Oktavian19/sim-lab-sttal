@@ -35,21 +35,6 @@ class AlatController extends Controller
                 return $alat->laboratorium ? $alat->laboratorium->nama_lab : '-';
             })
 
-            ->addColumn('kondisi', function ($alat) {
-                $baseClass = 'text-xs font-medium px-2.5 py-0.5 rounded border';
-
-                switch ($alat->kondisi) {
-                    case 'baik':
-                        return '<span class="'.$baseClass.' bg-green-100 text-green-800 border-green-200">Baik</span>';
-                    case 'maintenance':
-                        return '<span class="'.$baseClass.' bg-yellow-100 text-yellow-800 border-yellow-200">Maintenance</span>';
-                    case 'rusak':
-                        return '<span class="'.$baseClass.' bg-red-100 text-red-800 border-red-200">Rusak</span>';
-                    default:
-                        return '<span class="'.$baseClass.' bg-slate-100 text-slate-600 border-slate-200">-</span>';
-                }
-            })
-
             ->addColumn('aksi', function ($alat) {
                 return '
             <div class="flex items-center justify-center gap-3">
@@ -123,7 +108,7 @@ class AlatController extends Controller
             'merk' => $request->merk,
             'tahun_pengadaan' => $request->tahun_pengadaan,
             'lokasi' => $request->lokasi,
-            'kondisi' => 'baik',
+            'jumlah' => $request->jumlah,
             'foto_alat' => $path_foto,
         ]);
 
@@ -155,7 +140,7 @@ class AlatController extends Controller
             'merk' => 'required|min:3|max:100',
             'tahun_pengadaan' => 'required|numeric',
             'lokasi' => 'required',
-            'kondisi' => 'required',
+            'jumlah' => 'required|numeric|min:1',
             'foto_alat' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -191,7 +176,7 @@ class AlatController extends Controller
             'merk' => $request->merk,
             'tahun_pengadaan' => $request->tahun_pengadaan,
             'lokasi' => $request->lokasi,
-            'kondisi' => $request->kondisi,
+            'jumlah' => $request->jumlah,
             'foto_alat' => $path_foto ?? $alat->foto_alat,
         ]);
 

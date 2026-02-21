@@ -6,6 +6,7 @@ use App\Models\Alat;
 use App\Models\Laboratorium;
 use App\Models\PelaporanKerusakan;
 use App\Models\Peminjaman;
+use App\Models\PeminjamanDetailAlat;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -22,8 +23,10 @@ class DashboardController extends Controller
         switch ($user->role) {
             case 'admin':
                 $alat = [
-                    'total' => Alat::count(),
-                    'goodPercentage' => Alat::where('kondisi', 'baik')->count() / max(Alat::count(), 1) * 100,
+                    'total' => Alat::sum('jumlah'),
+                    'sedang_dipinjam' => PeminjamanDetailAlat::whereHas('peminjaman', function ($query) {
+                        $query->where('status_pengajuan', 'dipinjam');
+                    })->sum('jumlah'),
                 ];
                 $peminjaman = [
                     'validasi' => Peminjaman::where('status_pengajuan', 'pending')->count(),

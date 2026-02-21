@@ -14,6 +14,7 @@ class PeminjamanDetailAlat extends Model
     protected $fillable = [
         'peminjaman_id',
         'id_alat',
+        'jumlah',
         'kondisi_saat_pinjam',
         'kondisi_saat_kembali',
     ];

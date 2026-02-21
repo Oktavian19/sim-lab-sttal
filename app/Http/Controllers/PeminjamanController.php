@@ -22,7 +22,7 @@ class PeminjamanController extends Controller
     {
         $labs = Laboratorium::where('status', 'aktif')->get();
 
-        $alats = Alat::where('kondisi', 'baik')->with('laboratorium')->get();
+        $alats = Alat::with('laboratorium')->get();
 
         return view('peminjaman.create', compact('labs', 'alats'));
     }
@@ -37,10 +37,13 @@ class PeminjamanController extends Controller
             'id_lab' => 'nullable|exists:laboratorium,id',
             'alat_ids' => 'nullable|array',
             'alat_ids.*' => 'exists:alat,id',
+            'jumlah_alat' => 'nullable|array',
+            'jumlah_alat.*' => 'nullable|integer|min:1',
         ]);
         $conflictErrors = Peminjaman::checkAvailability(
             $request->id_lab,
             $request->alat_ids ?? [],
+            $request->jumlah_alat ?? [],
             $request->start_time,
             $request->end_time,
         );
@@ -68,12 +71,12 @@ class PeminjamanController extends Controller
 
             if ($request->has('alat_ids')) {
                 foreach ($request->alat_ids as $alatId) {
-                    $alat = Alat::find($alatId);
+                    $jumlahDiminta = isset($request->jumlah_alat[$alatId]) ? (int) $request->jumlah_alat[$alatId] : 1;
 
                     PeminjamanDetailAlat::create([
                         'peminjaman_id' => $peminjaman->id,
                         'id_alat' => $alatId,
-                        'kondisi_saat_pinjam' => $alat->kondisi,
+                        'jumlah' => $jumlahDiminta,
                     ]);
                 }
             }
@@ -102,12 +105,17 @@ class PeminjamanController extends Controller
     {
         $labs = Laboratorium::where('status', '!=', 'nonaktif')->get();
 
-        $alats = Alat::where('kondisi', 'baik')->with('laboratorium')->get();
+        $alats = Alat::with('laboratorium')->get();
 
         $peminjamans = Peminjaman::with(['peminjam', 'detailAlat'])
             ->whereIn('status_pengajuan', ['pending', 'disetujui', 'dipinjam'])
             ->get()
             ->map(function ($item) {
+                $alatDipinjam = [];
+                foreach ($item->detailAlat as $detail) {
+                    $alatDipinjam[$detail->id_alat] = $detail->jumlah;
+                }
+
                 return [
                     'id' => $item->id,
                     'id_lab' => $item->id_lab,
@@ -116,7 +124,7 @@ class PeminjamanController extends Controller
                     'status_pengajuan' => $item->status_pengajuan,
                     'kegiatan' => $item->kegiatan,
                     'peminjam_nama' => $item->peminjam->nama,
-                    'alat_dipinjam' => $item->detailAlat->pluck('id_alat')->toArray(),
+                    'alat_dipinjam' => $alatDipinjam,
                 ];
             });
 
@@ -548,5 +556,40 @@ class PeminjamanController extends Controller
         $detailAlat = PeminjamanDetailAlat::where('peminjaman_id', $id)->with('alat.laboratorium')->get();
 
         return view('peminjaman.riwayat.show', compact('peminjaman', 'detailAlat'));
+    }
+
+    public function checkAvailableStock(Request $request)
+    {
+        $request->validate([
+            'start_time' => 'required|date',
+            'end_time' => 'required|date|after:start_time',
+        ]);
+
+        $startTime = $request->start_time;
+        $endTime = $request->end_time;
+
+        $alats = Alat::all();
+        $alatIds = $alats->pluck('id')->toArray();
+
+        $borrowedTools = PeminjamanDetailAlat::selectRaw('id_alat, SUM(jumlah) as total_dipinjam')
+            ->whereHas('peminjaman', function ($q) use ($startTime, $endTime) {
+                $q->activeCollision($startTime, $endTime);
+            })
+            ->whereIn('id_alat', $alatIds)
+            ->groupBy('id_alat')
+            ->get()
+            ->keyBy('id_alat');
+
+        $availableStock = [];
+        
+        foreach ($alats as $alat) {
+            $borrowedQty = $borrowedTools->has($alat->id) ? (int) $borrowedTools->get($alat->id)->total_dipinjam : 0;
+            $availableStock[$alat->id] = max(0, $alat->jumlah - $borrowedQty);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $availableStock
+        ]);
     }
 }

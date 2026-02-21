@@ -137,26 +137,43 @@
 
                     <div class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100 bg-white"
                         id="toolsContainer">
-
                         @foreach ($alats as $alat)
-                            <div class="tool-item flex items-center justify-between p-3 hover:bg-gray-50 transition cursor-pointer group"
-                                onclick="toggleTool(this, '{{ $alat->id }}')">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="checkbox-indicator w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition bg-white text-white group-hover:border-blue-400">
-                                        <i class="fa-solid fa-check text-[10px]"></i>
+                            <div class="tool-item flex flex-col p-3 hover:bg-gray-50 transition group border-b border-gray-50"
+                                data-alat-id="{{ $alat->id }}">
+                                <div class="flex items-center justify-between cursor-pointer w-full"
+                                    onclick="toggleTool(this.parentElement, '{{ $alat->id }}')">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="checkbox-indicator w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition bg-white text-white group-hover:border-blue-400">
+                                            <i class="fa-solid fa-check text-[10px]"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-800 tool-name">{{ $alat->nama_alat }}
+                                            </p>
+                                            <p class="text-[11px] text-gray-500">
+                                                {{ $alat->merk }} • Lokasi: {{ $alat->laboratorium->nama_lab }}
+                                                <span
+                                                    class="stock-label ml-1 px-1.5 py-0.5 bg-gray-100 rounded text-gray-700 font-bold"
+                                                    data-original-stock="{{ $alat->jumlah }}">Stok:
+                                                    {{ $alat->jumlah }}</span>
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-800 tool-name">{{ $alat->nama_alat }}</p>
-                                        <p class="text-[11px] text-gray-500">{{ $alat->merk }} • Lokasi:
-                                            {{ $alat->laboratorium->nama_lab }}
-                                        </p>
+                                    <input type="checkbox" name="alat_ids[]" value="{{ $alat->id }}"
+                                        class="hidden tool-checkbox">
+                                </div>
+
+                                <div class="quantity-container hidden mt-3 pl-8 pb-1 transition-all duration-300">
+                                    <div class="flex items-center gap-3">
+                                        <label class="text-xs font-medium text-gray-600">Jumlah Pinjam:</label>
+                                        <input type="number" name="jumlah_alat[{{ $alat->id }}]" min="1"
+                                            max="{{ $alat->jumlah }}" value="1"
+                                            class="w-20 px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none quantity-input"
+                                            oninput="validateQuantity(this)">
+                                        <span class="text-[10px] text-red-500 italic hidden error-qty">Maksimal <span
+                                                class="max-qty-text">{{ $alat->jumlah }}</span></span>
                                     </div>
                                 </div>
-                                <span
-                                    class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded font-medium">Baik</span>
-                                <input type="checkbox" name="alat_ids[]" value="{{ $alat->id }}"
-                                    class="hidden tool-checkbox">
                             </div>
                         @endforeach
                     </div>
@@ -178,23 +195,116 @@
 @endsection
 @push('scripts')
     <script>
-        function toggleTool(element, id) {
-            const checkbox = element.querySelector('.tool-checkbox');
-            const indicator = element.querySelector('.checkbox-indicator');
+        function toggleTool(itemElement, id) {
+            const checkbox = itemElement.querySelector('.tool-checkbox');
+            const indicator = itemElement.querySelector('.checkbox-indicator');
+            const qtyContainer = itemElement.querySelector('.quantity-container');
+            const qtyInput = itemElement.querySelector('.quantity-input');
 
             checkbox.checked = !checkbox.checked;
 
             if (checkbox.checked) {
-                element.classList.add('bg-blue-50');
+                itemElement.classList.add('bg-blue-50');
                 indicator.classList.remove('bg-white', 'border-gray-300');
                 indicator.classList.add('bg-blue-600', 'border-blue-600');
+
+                qtyContainer.classList.remove('hidden');
+                qtyInput.setAttribute('required', 'required');
             } else {
-                element.classList.remove('bg-blue-50');
+                itemElement.classList.remove('bg-blue-50');
                 indicator.classList.add('bg-white', 'border-gray-300');
                 indicator.classList.remove('bg-blue-600', 'border-blue-600');
+
+                qtyContainer.classList.add('hidden');
+                qtyInput.removeAttribute('required');
+                qtyInput.value = 1;
+                itemElement.querySelector('.error-qty').classList.add('hidden');
             }
 
             updateToolCount();
+        }
+
+        function validateQuantity(input) {
+            let value = parseInt(input.value);
+            let maxStock = parseInt(input.getAttribute('max'));
+            const errorText = input.nextElementSibling;
+
+            if (value > maxStock) {
+                input.value = maxStock;
+                errorText.classList.remove('hidden');
+                setTimeout(() => errorText.classList.add('hidden'), 2000);
+            } else if (value < 1 || isNaN(value)) {
+                input.value = '';
+            } else {
+                errorText.classList.add('hidden');
+            }
+        }
+
+        function checkLiveStock() {
+            let start = $('#start_time').val();
+            let end = $('#end_time').val();
+
+            if (!start || !end) return;
+            if (new Date(start) >= new Date(end)) return;
+
+            $('#toolsContainer').css('opacity', '0.5');
+
+            $.ajax({
+                url: "{{ route('peminjaman.check-stock') }}",
+                type: "GET",
+                data: {
+                    start_time: start,
+                    end_time: end
+                },
+                success: function(res) {
+                    if (res.status) {
+                        let stocks = res.data;
+
+                        $('.tool-item').each(function() {
+                            let item = $(this);
+                            let alatId = item.attr('data-alat-id');
+                            let stockLabel = item.find('.stock-label');
+                            let qtyInput = item.find('.quantity-input');
+                            let checkbox = item.find('.tool-checkbox');
+
+                            let currentStock = stocks[alatId] !== undefined ? stocks[alatId] : parseInt(
+                                stockLabel.data('original-stock'));
+
+                            stockLabel.text('Stok: ' + currentStock);
+                            qtyInput.attr('max', currentStock);
+                            item.find('.max-qty-text').text(currentStock);
+
+                            if (currentStock <= 0) {
+                                item.addClass('opacity-50 pointer-events-none cursor-not-allowed');
+                                checkbox.prop('checked', false);
+
+                                item.removeClass('bg-blue-50');
+                                item.find('.checkbox-indicator').removeClass(
+                                    'bg-blue-600 border-blue-600').addClass(
+                                    'bg-white border-gray-300');
+                                item.find('.quantity-container').addClass('hidden');
+                                qtyInput.removeAttr('required');
+                            } else {
+                                item.removeClass('opacity-50 pointer-events-none cursor-not-allowed');
+
+                                if (checkbox.is(':checked')) {
+                                    if (parseInt(qtyInput.val()) > currentStock) {
+                                        qtyInput.val(currentStock);
+                                        item.find('.error-qty').removeClass('hidden');
+                                        setTimeout(() => item.find('.error-qty').addClass('hidden'),
+                                            3000);
+                                    }
+                                }
+                            }
+                        });
+
+                        updateToolCount();
+                    }
+                },
+                complete: function() {
+                    $('#toolsContainer').css('opacity', '1');
+                }
+            });
         }
 
         function updateToolCount() {
@@ -231,8 +341,9 @@
                 minDate: now,
                 onChange: function(selectedDates, dateStr, instance) {
                     endPicker.set('minDate', dateStr);
-
                     $("#start_time").valid();
+
+                    checkLiveStock();
                 }
             });
 
@@ -247,6 +358,8 @@
                 minDate: now,
                 onChange: function(selectedDates, dateStr, instance) {
                     $("#end_time").valid();
+
+                    checkLiveStock();
                 }
             });
 
@@ -337,22 +450,30 @@
                         });
 
                         document.getElementById('loanForm').reset();
+                        document.querySelectorAll('#toolsContainer .tool-checkbox').forEach(cb => cb
+                            .checked = false);
 
-                        document.querySelectorAll('#toolsContainer .tool-checkbox')
-                            .forEach(cb => cb.checked = false);
+                        document.querySelectorAll('#toolsContainer .tool-item').forEach(item => {
+                            item.classList.remove('bg-blue-50', 'border-blue-200');
 
-                        document.querySelectorAll('#toolsContainer .tool-item')
-                            .forEach(item => {
-                                item.classList.remove('bg-blue-50',
-                                    'border-blue-200');
+                            const indicator = item.querySelector('.checkbox-indicator');
+                            if (indicator) {
+                                indicator.classList.remove('bg-blue-600', 'border-blue-600');
+                                indicator.classList.add('bg-white', 'border-gray-300');
+                            }
 
-                                const indicator = item.querySelector('.checkbox-indicator');
-                                if (indicator) {
-                                    indicator.classList.remove('bg-blue-500', 'border-blue-500');
-                                    indicator.classList.add('bg-white', 'border-gray-300');
-                                    indicator.innerHTML = '';
-                                }
-                            });
+                            const qtyContainer = item.querySelector('.quantity-container');
+                            if (qtyContainer) {
+                                qtyContainer.classList.add('hidden');
+                            }
+                            const qtyInput = item.querySelector('.quantity-input');
+                            if (qtyInput) {
+                                qtyInput.value = 1;
+                                qtyInput.removeAttribute('required');
+                            }
+                        });
+
+                        updateToolCount();
                     } else {
                         let errorListHtml = '';
 

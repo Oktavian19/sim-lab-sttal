@@ -21,6 +21,8 @@ class Peminjaman extends Model
         'jumlah_peserta',
         'status_pengajuan',
         'catatan_admin',
+        'bukti_pengambilan',
+        'bukti_pengembalian',
     ];
 
     protected $casts = [
@@ -64,7 +66,7 @@ class Peminjaman extends Model
     /**
      * Returns array of error if bentrok, or null if safe.
      */
-    public static function checkAvailability($labId, array $alatIds, $startTime, $endTime, $excludeId = null)
+    public static function checkAvailability($labId, array $alatIds, array $jumlahAlat, $startTime, $endTime, $excludeId = null)
     {
         $errors = [];
 
@@ -79,16 +81,36 @@ class Peminjaman extends Model
         }
 
         if (! empty($alatIds)) {
-            $conflictingTools = PeminjamanDetailAlat::whereHas('peminjaman', function ($q) use ($startTime, $endTime, $excludeId) {
-                $q->activeCollision($startTime, $endTime, $excludeId);
-            })
+            $borrowedTools = PeminjamanDetailAlat::selectRaw('id_alat, SUM(jumlah) as total_dipinjam')
+                ->whereHas('peminjaman', function ($q) use ($startTime, $endTime, $excludeId) {
+                    $q->activeCollision($startTime, $endTime, $excludeId);
+                })
                 ->whereIn('id_alat', $alatIds)
-                ->with('alat')
-                ->get();
+                ->groupBy('id_alat')
+                ->get()
+                ->keyBy('id_alat');
 
-            if ($conflictingTools->isNotEmpty()) {
-                $toolNames = $conflictingTools->map(fn ($item) => $item->alat->nama_alat)->unique()->implode(', ');
-                $errors[] = "Alat berikut sedang digunakan pada jam tersebut: {$toolNames}.";
+            $masterAlat = \App\Models\Alat::whereIn('id', $alatIds)->get()->keyBy('id');
+
+            foreach ($alatIds as $alatId) {
+                $alat = $masterAlat->get($alatId);
+                if (! $alat) {
+                    continue;
+                }
+
+                $requestedQty = isset($jumlahAlat[$alatId]) ? (int) $jumlahAlat[$alatId] : 1;
+
+                $borrowedQty = $borrowedTools->has($alatId) ? (int) $borrowedTools->get($alatId)->total_dipinjam : 0;
+
+                $availableQty = $alat->jumlah - $borrowedQty;
+
+                if ($requestedQty > $availableQty) {
+                    if ($availableQty > 0) {
+                        $errors[] = "Stok alat '{$alat->nama_alat}' tidak mencukupi. Tersedia: {$availableQty}, Diminta: {$requestedQty}.";
+                    } else {
+                        $errors[] = "Alat '{$alat->nama_alat}' sedang habis/terpakai penuh pada jam tersebut.";
+                    }
+                }
             }
         }
 

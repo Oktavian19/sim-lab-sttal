@@ -93,7 +93,7 @@
                                 <th class="px-4 py-3">Nama Alat</th>
                                 <th class="px-4 py-3">Merek</th>
                                 <th class="px-4 py-3">Lokasi (Lab)</th>
-                                <th class="px-4 py-3 text-center">Kondisi Saat Ini</th>
+                                <th class="px-4 py-3">Jumlah Pinjam</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -106,19 +106,8 @@
                                     <td class="px-4 py-3 font-medium text-gray-900">
                                         {{ $detail->alat->laboratorium->nama_lab }}
                                     </td>
-                                    <td class="px-4 py-3 text-center">
-                                        @php
-                                            $badge = match ($detail->alat->kondisi) {
-                                                'baik' => ['color' => 'green', 'label' => 'Baik'],
-                                                'maintenance' => ['color' => 'yellow', 'label' => 'Maintenance'],
-                                                'rusak' => ['color' => 'red', 'label' => 'Rusak'],
-                                                default => ['color' => 'gray', 'label' => '-'],
-                                            };
-                                        @endphp
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $badge['color'] }}-100 text-{{ $badge['color'] }}-800">
-                                            {{ $badge['label'] }}
-                                        </span>
+                                    <td class="px-4 py-3">
+                                        {{ $detail->jumlah }}
                                     </td>
                                 </tr>
                             @endforeach

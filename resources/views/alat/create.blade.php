@@ -44,6 +44,17 @@
             </div>
 
             <div>
+                <label for="jumlah" class="block text-sm font-medium text-gray-700">
+                    Jumlah
+                </label>
+                <input type="number" name="jumlah" id="jumlah"
+                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2
+                           focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    required>
+                <p id="error-jumlah" class="mt-1 text-sm text-red-600"></p>
+            </div>
+
+            <div>
                 <label for="lokasi" class="block text-sm font-medium text-gray-700">
                     Lokasi (Lab)
                 </label>
@@ -115,6 +126,11 @@
                 lokasi: {
                     required: true
                 },
+                jumlah: {
+                    required: true,
+                    number: true,
+                    min: 1
+                },
                 foto_alat: {
                     required: false,
                     extension: "jpg|jpeg|png",
@@ -140,6 +156,11 @@
                 },
                 lokasi: {
                     required: "Silahkan pilih laboratorium."
+                },
+                jumlah: {
+                    required: "Jumlah wajib diisi.",
+                    number: "Harus berupa angka.",
+                    min: "Jumlah minimal 1."
                 },
                 foto_alat: {
                     extension: "Format file harus JPG, JPEG, atau PNG."

@@ -17,14 +17,14 @@ class AlatSeeder extends Seeder
             'merk' => 'Dell',
             'tahun_pengadaan' => 2022,
             'lokasi' => 1,
-            'kondisi' => 'baik',
+            'jumlah' => 5,
         ]);
         Alat::create([
             'nama_alat' => 'Router Mikrotik',
             'merk' => 'Mikrotik',
             'tahun_pengadaan' => 2021,
             'lokasi' => 2,
-            'kondisi' => 'baik',
+            'jumlah' => 3,
         ]);
     }
 }

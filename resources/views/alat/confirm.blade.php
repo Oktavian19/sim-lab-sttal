@@ -57,6 +57,18 @@
                                     {{ $alat->laboratorium->nama_lab }}
                                 </td>
                             </tr>
+                            <tr class="bg-gray-50 text-right">
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase w-1/3">Tahun Pengadaan:</th>
+                                <td class="px-4 py-3 text-sm text-gray-900 bg-white text-left italic font-medium">
+                                    {{ $alat->tahun_pengadaan }}
+                                </td>
+                            </tr>
+                            <tr class="bg-gray-50 text-right">
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase w-1/3">Jumlah:</th>
+                                <td class="px-4 py-3 text-sm text-gray-900 bg-white text-left italic font-medium">
+                                    {{ $alat->jumlah }}
+                                </td>
+                            </tr>
                         </table>
                     </div>
                 </div>

@@ -24,6 +24,8 @@ return new class extends Migration
 
             $table->enum('status_pengajuan', ['pending', 'disetujui', 'ditolak', 'selesai', 'dibatalkan', 'dipinjam'])->default('pending');
             $table->text('catatan_admin')->nullable();
+            $table->string('bukti_pengambilan')->nullable();
+            $table->string('bukti_pengembalian')->nullable();
             $table->timestamps();
 
             $table->index(['id_lab', 'start_time', 'end_time']);

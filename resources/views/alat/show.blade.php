@@ -27,24 +27,9 @@
 
                 <div class="mt-4 space-y-2">
                     <div class="text-center">
-                        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Kondisi</span>
+                        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Jumlah</span>
                         <div class="mt-1">
-                            @if ($alat->kondisi == 'baik')
-                                <span
-                                    class="px-3 py-1 text-sm font-medium text-green-800 bg-green-100 rounded-full border border-green-200">
-                                    Baik
-                                </span>
-                            @elseif($alat->kondisi == 'rusak_ringan')
-                                <span
-                                    class="px-3 py-1 text-sm font-medium text-yellow-800 bg-yellow-100 rounded-full border border-yellow-200">
-                                    Rusak Ringan
-                                </span>
-                            @else
-                                <span
-                                    class="px-3 py-1 text-sm font-medium text-red-800 bg-red-100 rounded-full border border-red-200">
-                                    Rusak Berat
-                                </span>
-                            @endif
+                            {{ $alat->jumlah }}
                         </div>
                     </div>
                 </div>

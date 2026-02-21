@@ -79,9 +79,12 @@
                         <thead class="bg-gray-50 text-gray-500 border-b border-gray-200">
                             <tr>
                                 <th class="px-4 py-3 font-medium">Nama Alat</th>
-                                <th class="px-4 py-3 font-medium">Kondisi Awal</th>
+                                <th class="px-4 py-3 font-medium">Jumlah</th>
+                                @if ($peminjaman->status_pengajuan === 'dipinjam')
+                                <th class="px-4 py-3 font-medium">Kondisi Saat Peminjaman</th>
+                                @endif
                                 @if ($peminjaman->status_pengajuan === 'selesai')
-                                    <th class="px-4 py-3 font-medium">Kondisi Akhir</th>
+                                    <th class="px-4 py-3 font-medium">Kondisi Saat Pengembalian</th>
                                 @endif
                             </tr>
                         </thead>
@@ -95,7 +98,7 @@
                                     <td class="px-4 py-3">
                                         <span
                                             class="px-2 py-1 bg-green-50 text-green-700 rounded text-xs border border-green-100">
-                                            {{ ucfirst($detail->kondisi_saat_pinjam) }}
+                                            {{ $detail->jumlah }}
                                         </span>
                                     </td>
                                     @if ($peminjaman->status_pengajuan === 'selesai')

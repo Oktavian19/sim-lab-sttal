@@ -26,7 +26,7 @@
                             <th class="px-4 py-3">Nama Alat</th>
                             <th class="px-4 py-3">Lokasi (Lab)</th>
                             <th class="px-4 py-3">Tahun Pengadaan</th>
-                            <th class="px-4 py-3">Kondisi</th>
+                            <th class="px-4 py-3">Jumlah</th>
                             <th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -95,8 +95,8 @@
                         className: 'px-4 py-3'
                     },
                     {
-                        data: 'kondisi',
-                        name: 'status_kondisi',
+                        data: 'jumlah',
+                        name: 'jumlah',
                         className: 'px-4 py-3'
                     },
                     {

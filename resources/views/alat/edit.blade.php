@@ -45,6 +45,17 @@
             </div>
 
             <div>
+                <label for="jumlah" class="block text-sm font-medium text-gray-700">
+                    Jumlah
+                </label>
+                <input type="number" name="jumlah" id="jumlah"
+                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2
+                           focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    required value="{{ $alat->jumlah }}">
+                <p id="error-jumlah" class="mt-1 text-sm text-red-600"></p>
+            </div>
+
+            <div>
                 <label for="lokasi" class="block text-sm font-medium text-gray-700">
                     Lokasi (Lab)
                 </label>
@@ -59,20 +70,6 @@
                     @endforeach
                 </select>
                 <p id="error-lokasi" class="mt-1 text-sm text-red-600"></p>
-            </div>
-
-                        <div>
-                <label for="kondisi" class="block text-sm font-medium text-gray-700">
-                    Kondisi Alat
-                </label>
-                <select name="kondisi" id="kondisi"
-                    class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm
-                   focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                    <option value="baik" {{ $alat->kondisi == 'baik' ? 'selected' : '' }}>Baik</option>
-                    <option value="rusak" {{ $alat->kondisi == 'rusak' ? 'selected' : '' }}>Rusak</option>
-                    <option value="maintenance" {{ $alat->kondisi == 'maintenance' ? 'selected' : '' }}>Maintenance</option>
-                </select>
-                <p id="error-kondisi" class="mt-1 text-sm text-red-600"></p>
             </div>
 
             <div>
@@ -132,8 +129,10 @@
                 lokasi: {
                     required: true
                 },
-                kondisi: {
-                    required: true
+                jumlah: {
+                    required: true,
+                    number: true,
+                    min: 1
                 },
                 foto_alat: {
                     required: false,
@@ -160,6 +159,11 @@
                 },
                 lokasi: {
                     required: "Silahkan pilih laboratorium."
+                },
+                jumlah: {
+                    required: "Jumlah wajib diisi.",
+                    number: "Harus berupa angka.",
+                    min: "Jumlah minimal 1."
                 },
                 foto_alat: {
                     extension: "Format file harus JPG, JPEG, atau PNG."

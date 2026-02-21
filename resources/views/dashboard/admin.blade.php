@@ -35,7 +35,7 @@
                 </div>
                 <div class="text-xs text-slate-500">
                     <span class="text-green-500 font-bold"><i class="fa-solid fa-check"></i>
-                        {{ $alat['goodPercentage'] }}%</span> Kondisi Baik
+                        {{ $alat['sedang_dipinjam'] }}</span> sedang dipinjam
                 </div>
             </div>
 

@@ -173,7 +173,7 @@
             const day = String(selectedDate.getDate()).padStart(2, '0');
             const selectedDateStr = `${year}-${month}-${day}`;
 
-            return MOCK_PEMINJAMAN.find(b => {
+            const foundBooking = MOCK_PEMINJAMAN.find(b => {
                 const bookingStart = new Date(b.start_time);
                 const bookingEnd = new Date(b.end_time);
 
@@ -185,12 +185,9 @@
                 if (type === 'lab') {
                     isResourceMatch = (b.id_lab == resourceId);
                 } else {
-                    if (Array.isArray(b.alat_dipinjam)) {
-                        isResourceMatch = b.alat_dipinjam.includes(resourceId);
-                    } else {
-                        isResourceMatch = JSON.parse(b.alat_dipinjam || '[]').includes(resourceId);
-                    }
+                    isResourceMatch = b.alat_dipinjam && b.alat_dipinjam.hasOwnProperty(resourceId);
                 }
+
                 if (!isResourceMatch) return false;
 
                 const startHour = bookingStart.getHours();
@@ -203,6 +200,17 @@
 
                 return hour >= startHour && hour < endHour;
             });
+
+            if (!foundBooking) return null;
+
+            if (type === 'alat') {
+                return {
+                    ...foundBooking,
+                    jumlah_dipinjam: foundBooking.alat_dipinjam[resourceId]
+                };
+            }
+
+            return foundBooking;
         }
 
         function renderGrid() {
@@ -221,22 +229,21 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50/50 transition-colors group/row";
 
-                const isMaintenance = (viewMode === 'lab' && res.status === 'perbaikan') ||
-                    (viewMode === 'alat' && res.kondisi === 'rusak');
-
                 let badgeHTML = '';
                 let subText = '';
+                let isMaintenance = false;
 
                 if (viewMode === 'lab') {
                     const isActive = res.status === 'aktif';
+                    isMaintenance = res.status === 'perbaikan';
                     badgeHTML =
                         `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-orange-100 text-orange-800'}">${res.status}</span>`;
-                    subText = `<i class="fa-solid fa-users text-slate-400 mr-1"></i> ${res.kapasitas || 0} Org`;
+                    subText =
+                        `<i class="fa-solid fa-users text-slate-400 mr-1"></i> Kapasitas: ${res.kapasitas || 0}`;
                 } else {
-                    const isGood = res.kondisi === 'baik';
                     badgeHTML =
-                        `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${isGood ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">${res.kondisi}</span>`;
-                    subText = res.merk || '-';
+                        `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">Total Stok: ${res.jumlah || 0}</span>`;
+                    subText = `<i class="fa-solid fa-tag text-slate-400 mr-1"></i> ${res.merk || '-'}`;
                 }
 
                 const infoCell = `
@@ -268,16 +275,18 @@
                     const booking = checkAvailability(res.id, hour, viewMode);
 
                     if (booking) {
-                        const isApproved = booking.status_pengajuan === 'disetujui';
+                        const isApproved = booking.status_pengajuan === 'disetujui' || booking
+                            .status_pengajuan === 'dipinjam';
                         const colorClass = isApproved ?
                             'bg-green-100 border-green-200 text-green-800 hover:bg-green-200' :
                             'bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100';
 
                         tr.innerHTML += `
                             <td class="p-1 h-20 border-r border-gray-100 relative group cursor-pointer" title="${booking.kegiatan} oleh ${booking.peminjam_nama}">
-                                <div class="w-full h-full rounded border px-1 py-1 text-[10px] leading-tight overflow-hidden ${colorClass} transition-colors shadow-sm">
+                                <div class="flex flex-col justify-start w-full h-full rounded border px-1.5 py-1 text-[10px] leading-tight overflow-hidden ${colorClass} transition-colors shadow-sm">
                                     <div class="font-bold truncate">${booking.kegiatan}</div>
                                     <div class="truncate opacity-75 text-[9px] mt-0.5">${booking.peminjam_nama || 'User'}</div>
+                                    <div class="truncate opacity-75 text-[9px] mt-0.5">Pinjam: ${booking.jumlah_dipinjam}</div>
                                 </div>
                             </td>`;
                     } else {

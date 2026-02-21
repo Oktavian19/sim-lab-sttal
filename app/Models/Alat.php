@@ -16,7 +16,7 @@ class Alat extends Model
         'merk',
         'tahun_pengadaan',
         'lokasi',
-        'kondisi',
+        'jumlah',
         'foto_alat',
     ];
 

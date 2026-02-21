@@ -23,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [AuthController::class, 'editProfile'])->name('profile.edit');
     Route::post('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/peminjaman/check-stock', [PeminjamanController::class, 'checkAvailableStock'])->name('peminjaman.check-stock');
     Route::middleware(['role:admin'])->group(function () {
         Route::prefix('{role}')
             ->whereIn('role', ['admin', 'user'])
