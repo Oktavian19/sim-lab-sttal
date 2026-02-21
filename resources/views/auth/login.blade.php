@@ -22,8 +22,8 @@
         <!-- Header Section -->
         <div class="bg-slate-900 p-8 text-center border-b-4 border-blue-500">
             <div
-                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-800 text-blue-400 mb-4 shadow-inner">
-                <i class="fa-solid fa-anchor text-3xl"></i>
+                class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-slate-800 text-blue-400 mb-4 shadow-inner">
+                <img src="{{ asset('images/logo.png') }}" alt="Icon" class="w-20 h-20 object-contain">
             </div>
             <h2 class="text-2xl font-bold text-white tracking-wider">SIM LAB <span class="text-blue-500">STTAL</span>
             </h2>

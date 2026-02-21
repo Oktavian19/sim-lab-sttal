@@ -10,7 +10,7 @@
 
     <div class="h-16 flex items-center justify-center border-b border-slate-700 bg-slate-900">
         <div class="flex items-center gap-3">
-            <i class="fa-solid fa-anchor text-blue-400 text-2xl"></i>
+            <img src="{{ asset('images/logo.png') }}" alt="Icon" class="w-10 h-10 object-contain">
             <h1 class="text-xl font-bold tracking-wider">SIM LAB <span class="text-blue-400">STTAL</span></h1>
         </div>
     </div>
