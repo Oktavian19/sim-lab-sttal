@@ -21,6 +21,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [AuthController::class, 'editProfile'])->name('profile.edit');
+    Route::post('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::middleware(['role:admin'])->group(function () {
         Route::prefix('{role}')
             ->whereIn('role', ['admin', 'user'])

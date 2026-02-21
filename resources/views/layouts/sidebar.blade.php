@@ -15,7 +15,7 @@
         </div>
     </div>
 
-    <div class="p-4 border-b border-slate-700 flex items-center gap-3 bg-slate-900">
+    <a href="{{ route('profile.edit') }}" class="p-4 border-b border-slate-700 flex items-center gap-3 bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer group">
         @if (auth()->user()->photo_path)
             <img src="{{ asset('storage/' . auth()->user()->photo_path) }}" alt="User Avatar"
                 class="w-10 h-10 rounded-full object-cover border border-slate-600">
@@ -28,7 +28,7 @@
             <p class="text-sm font-semibold text-white">{{ Str::limit(auth()->user()->nama ?? 'User', 18) }}</p>
             <p class="text-xs text-slate-400">NRP. {{ auth()->user()->nrp }}</p>
         </div>
-    </div>
+    </a>
 
     <nav class="flex-1 overflow-y-auto py-4 space-y-1 bg-slate-800 scrollbar-thin scrollbar-thumb-slate-600">
 
