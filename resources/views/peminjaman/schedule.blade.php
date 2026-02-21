@@ -281,12 +281,14 @@
                             'bg-green-100 border-green-200 text-green-800 hover:bg-green-200' :
                             'bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100';
 
+                        const bookingQuantity = viewMode === 'alat' ? booking.jumlah_dipinjam : null;
+
                         tr.innerHTML += `
                             <td class="p-1 h-20 border-r border-gray-100 relative group cursor-pointer" title="${booking.kegiatan} oleh ${booking.peminjam_nama}">
                                 <div class="flex flex-col justify-start w-full h-full rounded border px-1.5 py-1 text-[10px] leading-tight overflow-hidden ${colorClass} transition-colors shadow-sm">
                                     <div class="font-bold truncate">${booking.kegiatan}</div>
                                     <div class="truncate opacity-75 text-[9px] mt-0.5">${booking.peminjam_nama || 'User'}</div>
-                                    <div class="truncate opacity-75 text-[9px] mt-0.5">Pinjam: ${booking.jumlah_dipinjam}</div>
+                                    ${bookingQuantity ? `<div class="truncate opacity-75 text-[9px] mt-0.5">Jumlah: ${bookingQuantity}</div>` : ''}
                                 </div>
                             </td>`;
                     } else {
