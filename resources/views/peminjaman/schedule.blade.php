@@ -194,7 +194,12 @@
                 if (!isResourceMatch) return false;
 
                 const startHour = bookingStart.getHours();
-                const endHour = bookingEnd.getHours();
+
+                let endHour = bookingEnd.getHours();
+
+                if (bookingEnd.getMinutes() > 0 || bookingEnd.getSeconds() > 0) {
+                    endHour += 1;
+                }
 
                 return hour >= startHour && hour < endHour;
             });

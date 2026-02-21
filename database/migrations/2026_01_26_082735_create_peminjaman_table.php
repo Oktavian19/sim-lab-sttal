@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('kegiatan', 255);
             $table->integer('jumlah_peserta');
 
-            $table->enum('status_pengajuan', ['pending', 'disetujui', 'ditolak', 'selesai', 'dibatalkan'])->default('pending');
+            $table->enum('status_pengajuan', ['pending', 'disetujui', 'ditolak', 'selesai', 'dibatalkan', 'dipinjam'])->default('pending');
             $table->text('catatan_admin')->nullable();
             $table->timestamps();
 

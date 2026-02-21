@@ -16,8 +16,8 @@ class PeminjamanSeeder extends Seeder
         Peminjaman::create([
             'id_peminjam' => 3,
             'id_lab' => 1,
-            'start_time' => Carbon::yesterday()->setHour(9)->setMinute(0),
-            'end_time' => Carbon::yesterday()->setHour(11)->setMinute(0),
+            'start_time' => Carbon::tomorrow()->setHour(9)->setMinute(0),
+            'end_time' => Carbon::tomorrow()->setHour(11)->setMinute(0),
             'kegiatan' => 'Praktikum Pemrograman Web',
             'jumlah_peserta' => 30,
             'status_pengajuan' => 'disetujui',
@@ -27,8 +27,8 @@ class PeminjamanSeeder extends Seeder
         Peminjaman::create([
             'id_peminjam' => 3,
             'id_lab' => 2,
-            'start_time' => Carbon::yesterday()->setHour(9)->setMinute(0),
-            'end_time' => Carbon::yesterday()->addDay(1)->setHour(11)->setMinute(0),
+            'start_time' => Carbon::tomorrow()->setHour(9)->setMinute(0),
+            'end_time' => Carbon::tomorrow()->setHour(11)->setMinute(0),
             'kegiatan' => 'Penelitian Skripsi',
             'jumlah_peserta' => 5,
             'status_pengajuan' => 'pending',

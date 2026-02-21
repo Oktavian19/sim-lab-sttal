@@ -8,7 +8,7 @@
 
             <div
                 class="flex space-x-1 bg-white p-1 rounded-lg border border-gray-200 shadow-sm w-full sm:w-auto overflow-x-auto">
-                @foreach (['all' => 'Semua', 'pending' => 'Menunggu', 'disetujui' => 'Berjalan', 'selesai' => 'Selesai'] as $key => $label)
+                @foreach (['all' => 'Semua', 'pending' => 'Menunggu', 'disetujui' => 'Disetujui', 'dipinjam' => 'Dipinjam', 'selesai' => 'Selesai'] as $key => $label)
                     <a href="{{ route('peminjaman.riwayatUser', ['status' => $key]) }}"
                         class="px-4 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap 
                    {{ $currentStatus == $key ? 'bg-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-200' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50' }}">

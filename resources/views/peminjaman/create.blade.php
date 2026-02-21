@@ -218,15 +218,17 @@
         });
 
         $(document).ready(function() {
+            const now = new Date();
+
             const startPicker = flatpickr("#start_time", {
                 enableTime: true,
                 enableMinutes: false,
-                dateFormat: "Y-m-d H:00:00",
+                dateFormat: "Y-m-d H:i:00",
                 altInput: true,
-                altFormat: "l, d F Y H:00",
+                altFormat: "l, d F Y H:i",
                 time_24hr: true,
                 locale: "id",
-                minDate: "today",
+                minDate: now,
                 onChange: function(selectedDates, dateStr, instance) {
                     endPicker.set('minDate', dateStr);
 
@@ -237,12 +239,12 @@
             const endPicker = flatpickr("#end_time", {
                 enableTime: true,
                 enableMinutes: false,
-                dateFormat: "Y-m-d H:00:00",
+                dateFormat: "Y-m-d H:i:00",
                 altInput: true,
-                altFormat: "l, d F Y H:00",
+                altFormat: "l, d F Y H:i",
                 time_24hr: true,
                 locale: "id",
-                minDate: "today",
+                minDate: now,
                 onChange: function(selectedDates, dateStr, instance) {
                     $("#end_time").valid();
                 }
@@ -250,7 +252,7 @@
 
             $.validator.addMethod("greaterThan", function(value, element, param) {
                 var startDate = $(param).val();
-                if (!value || !startDate) return true; 
+                if (!value || !startDate) return true;
                 return new Date(value) > new Date(startDate);
             }, "Waktu selesai harus setelah waktu mulai.");
 
@@ -326,7 +328,7 @@
                     if (res.status) {
                         hideModal();
 
-                                                Swal.fire({
+                        Swal.fire({
                             icon: 'success',
                             title: 'Berhasil',
                             text: res.message,
@@ -342,13 +344,13 @@
                         document.querySelectorAll('#toolsContainer .tool-item')
                             .forEach(item => {
                                 item.classList.remove('bg-blue-50',
-                                'border-blue-200'); 
+                                    'border-blue-200');
 
                                 const indicator = item.querySelector('.checkbox-indicator');
                                 if (indicator) {
                                     indicator.classList.remove('bg-blue-500', 'border-blue-500');
                                     indicator.classList.add('bg-white', 'border-gray-300');
-                                    indicator.innerHTML = ''; 
+                                    indicator.innerHTML = '';
                                 }
                             });
                     } else {

@@ -105,7 +105,7 @@ class PeminjamanController extends Controller
         $alats = Alat::where('kondisi', 'baik')->with('laboratorium')->get();
 
         $peminjamans = Peminjaman::with(['peminjam', 'detailAlat'])
-            ->whereIn('status_pengajuan', ['pending', 'disetujui'])
+            ->whereIn('status_pengajuan', ['pending', 'disetujui', 'dipinjam'])
             ->get()
             ->map(function ($item) {
                 return [
