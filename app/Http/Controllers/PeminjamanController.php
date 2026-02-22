@@ -29,23 +29,37 @@ class PeminjamanController extends Controller
 
     public function store(Request $request)
     {
+        $startDateTime = $request->tanggal_peminjaman.' '.$request->start_time.':00';
+        $endDateTime = $request->tanggal_peminjaman.' '.$request->end_time.':00';
+
+        $request->merge([
+            'start_datetime' => $startDateTime,
+            'end_datetime' => $endDateTime,
+        ]);
+
         $request->validate([
             'kegiatan' => 'required|string|max:255',
-            'jumlah_peserta' => 'required|integer|min:1',
-            'start_time' => 'required|date|after:now',
-            'end_time' => 'required|date|after:start_time',
-            'id_lab' => 'nullable|exists:laboratorium,id',
-            'alat_ids' => 'nullable|array',
+            'hanya_alat' => 'nullable',
+            'jumlah_peserta' => 'required_without:hanya_alat|nullable|integer|min:1',
+            'id_lab' => 'required|exists:laboratorium,id',
+            'start_datetime' => 'required|date',
+            'end_datetime' => 'required|date|after:start_datetime',
+            'alat_ids' => 'required_with:hanya_alat|nullable|array',
             'alat_ids.*' => 'exists:alat,id',
             'jumlah_alat' => 'nullable|array',
             'jumlah_alat.*' => 'nullable|integer|min:1',
         ]);
+
+        $isHanyaAlat = $request->has('hanya_alat');
+        $idLabToSave = $isHanyaAlat ? null : $request->id_lab;
+        $pesertaToSave = $isHanyaAlat ? 1 : $request->jumlah_peserta;
+
         $conflictErrors = Peminjaman::checkAvailability(
-            $request->id_lab,
+            $idLabToSave,
             $request->alat_ids ?? [],
             $request->jumlah_alat ?? [],
-            $request->start_time,
-            $request->end_time,
+            $startDateTime,
+            $endDateTime,
         );
 
         if ($conflictErrors) {
@@ -56,16 +70,17 @@ class PeminjamanController extends Controller
                 'errors' => $conflictErrors,
             ]);
         }
+
         DB::beginTransaction();
 
         try {
             $peminjaman = Peminjaman::create([
                 'id_peminjam' => Auth::id(),
-                'id_lab' => $request->id_lab,
-                'start_time' => $request->start_time,
-                'end_time' => $request->end_time,
+                'id_lab' => $idLabToSave, 
+                'start_time' => $startDateTime,
+                'end_time' => $endDateTime,
                 'kegiatan' => $request->kegiatan,
-                'jumlah_peserta' => $request->jumlah_peserta,
+                'jumlah_peserta' => $pesertaToSave, 
                 'status_pengajuan' => 'pending',
             ]);
 
@@ -97,7 +112,6 @@ class PeminjamanController extends Controller
                 'status' => false,
                 'message' => 'Terjadi kesalahan: '.$e->getMessage(),
             ]);
-
         }
     }
 
@@ -581,7 +595,7 @@ class PeminjamanController extends Controller
             ->keyBy('id_alat');
 
         $availableStock = [];
-        
+
         foreach ($alats as $alat) {
             $borrowedQty = $borrowedTools->has($alat->id) ? (int) $borrowedTools->get($alat->id)->total_dipinjam : 0;
             $availableStock[$alat->id] = max(0, $alat->jumlah - $borrowedQty);
@@ -589,7 +603,7 @@ class PeminjamanController extends Controller
 
         return response()->json([
             'status' => true,
-            'data' => $availableStock
+            'data' => $availableStock,
         ]);
     }
 }

@@ -79,6 +79,7 @@
                         <thead class="bg-gray-50 text-gray-500 border-b border-gray-200">
                             <tr>
                                 <th class="px-4 py-3 font-medium">Nama Alat</th>
+                                <th class="px-4 py-3 font-medium">Lokasi</th>
                                 <th class="px-4 py-3 font-medium">Jumlah</th>
                                 @if ($peminjaman->status_pengajuan === 'dipinjam')
                                 <th class="px-4 py-3 font-medium">Kondisi Saat Peminjaman</th>
@@ -94,6 +95,12 @@
                                     <td class="px-4 py-3">
                                         <div class="font-medium text-gray-900">{{ $detail->alat->nama_alat }}</div>
                                         <div class="text-xs text-gray-500">{{ $detail->alat->merk }}</div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span
+                                            class="font-medium text-gray-900">
+                                            {{ $detail->alat->laboratorium->nama_lab }}
+                                        </span>
                                     </td>
                                     <td class="px-4 py-3">
                                         <span
