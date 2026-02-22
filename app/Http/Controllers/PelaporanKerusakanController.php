@@ -113,7 +113,7 @@ class PelaporanKerusakanController extends Controller
         $validator = Validator::make($request->all(), [
             'alat_id' => 'required|exists:alat,id',
             'deskripsi' => 'required|string|max:1000',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'foto' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -126,14 +126,14 @@ class PelaporanKerusakanController extends Controller
 
         $path_foto = null;
         if ($request->hasFile('foto')) {
-            $path_foto = $request->file('foto')->store('public/foto_kerusakan');
+            $path_foto = $request->file('foto')->store('uploads/foto_kerusakan', 'public');
         }
 
         PelaporanKerusakan::create([
             'id_pelapor' => Auth::id(),
             'id_alat' => $request->alat_id,
             'deskripsi_kerusakan' => $request->deskripsi,
-            'foto_bukti' => $path_foto ? basename($path_foto) : null,
+            'foto_bukti' => $path_foto,
         ]);
 
         return response()->json([
@@ -189,5 +189,12 @@ class PelaporanKerusakanController extends Controller
             'status' => true,
             'message' => 'Data berhasil diperbarui.',
         ]);
+    }
+
+    public function riwayatUser()
+    {
+        $laporan = PelaporanKerusakan::where('id_pelapor', Auth::id())->with('alat', 'alat.laboratorium')->orderBy('created_at', 'desc')->get();
+
+        return view('laporan.user.riwayat', compact('laporan'));
     }
 }
