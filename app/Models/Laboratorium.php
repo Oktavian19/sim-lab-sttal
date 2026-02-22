@@ -20,7 +20,7 @@ class Laboratorium extends Model
 
     public function alat()
     {
-        return $this->hasMany(Alat::class, 'id_lab');
+        return $this->hasMany(Alat::class, 'lokasi');
     }
 
     public function peminjaman()

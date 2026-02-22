@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Laboratorium;
 use App\Models\PelaporanKerusakan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -86,6 +88,58 @@ class PelaporanKerusakanController extends Controller
         }
 
         return view('laporan.show', compact('laporan'));
+    }
+
+    public function create()
+    {
+        $laboratorium = Laboratorium::with('alat')->get();
+        $alat = $laboratorium->flatMap(function ($lab) {
+            return $lab->alat->map(function ($alat) use ($lab) {
+                return [
+                    'id' => $alat->id,
+                    'nama_alat' => $alat->nama_alat,
+                    'merk' => $alat->merk,
+                    'lokasi' => $lab->id,
+                    'laboratorium' => $lab->nama_lab,
+                ];
+            });
+        });
+
+        return view('laporan.user.create', compact('laboratorium', 'alat'));
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'alat_id' => 'required|exists:alat,id',
+            'deskripsi' => 'required|string|max:1000',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $path_foto = null;
+        if ($request->hasFile('foto')) {
+            $path_foto = $request->file('foto')->store('public/foto_kerusakan');
+        }
+
+        PelaporanKerusakan::create([
+            'id_pelapor' => Auth::id(),
+            'id_alat' => $request->alat_id,
+            'deskripsi_kerusakan' => $request->deskripsi,
+            'foto_bukti' => $path_foto ? basename($path_foto) : null,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Laporan kerusakan berhasil dibuat.',
+        ]);
     }
 
     public function edit($id)

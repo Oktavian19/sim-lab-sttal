@@ -102,5 +102,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/riwayat/show/{id}', [PeminjamanController::class, 'showRiwayatUser'])->name('riwayatUser.show');
             Route::post('/cancel/{id}', [PeminjamanController::class, 'cancel'])->name('cancel');
         });
+        Route::prefix('laporan')->name('laporan.')->group(function () {
+            Route::get('/create', [PelaporanKerusakanController::class, 'create'])->name('create');
+            Route::post('/store', [PelaporanKerusakanController::class, 'store'])->name('store');
+            Route::get('/riwayat', [PelaporanKerusakanController::class, 'riwayatUser'])->name('riwayatUser');
+            Route::get('/riwayat/show/{id}', [PelaporanKerusakanController::class, 'showRiwayatUser'])->name('riwayatUser.show');
+        });
     });
 });
