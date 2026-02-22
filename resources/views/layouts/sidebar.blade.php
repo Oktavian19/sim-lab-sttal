@@ -134,9 +134,15 @@
 
             <p class="px-6 mt-6 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Pusat Bantuan</p>
 
-            <a href="#" class="{{ request()->routeIs('laporan.*') ? $activeClass : $inactiveClass }}">
+            <a href="{{ route('laporan.create') }}" class="{{ request()->routeIs('laporan.create') ? $activeClass : $inactiveClass }}">
                 <i class="fa-solid fa-triangle-exclamation w-6 group-hover:text-red-400 transition-colors"></i>
                 <span class="text-sm font-medium">Lapor Kerusakan</span>
+            </a>
+
+            <a href="{{ route('laporan.riwayatUser') }}"
+                class="{{ request()->routeIs('laporan.riwayatUser') ? $activeClass : $inactiveClass }}">
+                <i class="fa-solid fa-clock-rotate-left w-6 group-hover:text-red-400 transition-colors"></i>
+                <span class="text-sm font-medium">Riwayat Laporan</span>
             </a>
         @endif
     </nav>
