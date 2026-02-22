@@ -433,13 +433,14 @@ class PeminjamanController extends Controller
                                 <i class="fa-solid fa-hand-holding"></i> Ambil
                               </a>';
                 } elseif ($peminjaman->status_pengajuan == 'dipinjam') {
-                    $html .= '<a href="/peminjaman/'.$peminjaman->id.'/editMonitoring" onclick="modalAction(this.href); return false;"
+                    $html .= '<a href="/peminjaman/'.$peminjaman->id.'/pengembalianMonitoring" onclick="modalAction(this.href); return false;"
                                 class="text-slate-500 hover:text-green-600 bg-slate-100 p-2 rounded-md" title="Proses Pengembalian">
                                 <i class="fa-solid fa-arrow-rotate-left"></i> Kembali
                               </a>';
                 }
 
                 $html .= '</div>';
+
                 return $html;
             })
             ->rawColumns(['mulai_pinjam', 'peminjam', 'tenggat_waktu', 'kegiatan', 'jumlah_peserta', 'aksi'])
@@ -452,14 +453,6 @@ class PeminjamanController extends Controller
         $detailAlat = PeminjamanDetailAlat::where('peminjaman_id', $id)->with('alat.laboratorium')->get();
 
         return view('peminjaman.monitoring.show', compact('peminjaman', 'detailAlat'));
-    }
-
-    public function editMonitoring($id)
-    {
-        $peminjaman = Peminjaman::findOrFail($id);
-        $detailAlat = PeminjamanDetailAlat::where('peminjaman_id', $id)->with('alat.laboratorium')->get();
-
-        return view('peminjaman.monitoring.edit', compact('peminjaman', 'detailAlat'));
     }
 
     public function pengambilanMonitoring($id)
@@ -484,14 +477,22 @@ class PeminjamanController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Validasi gagal.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        $peminjaman = Peminjaman::findOrFail($id);
+
+        if ($peminjaman->start_time->isFuture()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Peminjaman belum bisa diambil karena jadwal mulai peminjaman belum tiba.',
             ]);
         }
 
         try {
             DB::beginTransaction();
 
-            $peminjaman = Peminjaman::findOrFail($id);
 
             $path_foto = null;
 
@@ -504,7 +505,6 @@ class PeminjamanController extends Controller
                 'bukti_pengambilan' => $path_foto,
             ]);
 
-
             if ($request->has('detail_id') && $request->has('kondisi_saat_pinjam')) {
                 $detailIds = $request->detail_id;
                 $kondisiArray = $request->kondisi_saat_pinjam;
@@ -512,7 +512,7 @@ class PeminjamanController extends Controller
                 foreach ($detailIds as $index => $detailId) {
                     PeminjamanDetailAlat::where('id', $detailId)
                         ->update([
-                            'kondisi_saat_pinjam' => $kondisiArray[$index]
+                            'kondisi_saat_pinjam' => $kondisiArray[$index],
                         ]);
                 }
             }
@@ -526,6 +526,7 @@ class PeminjamanController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'status' => false,
                 'message' => 'Terjadi kesalahan sistem saat memproses data.',
@@ -533,16 +534,61 @@ class PeminjamanController extends Controller
         }
     }
 
+    public function pengembalianMonitoring($id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+        $detailAlat = PeminjamanDetailAlat::where('peminjaman_id', $id)->with('alat.laboratorium')->get();
+
+        return view('peminjaman.monitoring.pengembalian', compact('peminjaman', 'detailAlat'));
+    }
+
     public function prosesPengembalian(Request $request, $id)
     {
-        DB::transaction(function () use ($request, $id) {
+        $validator = Validator::make($request->all(), [
+            'tanggal_kembali_realisasi' => 'required|date',
+            'status_pengembalian' => 'required|string',
+            'bukti_pengembalian' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'detail_id' => 'sometimes|array',
+            'detail_id.*' => 'exists:peminjaman_detail_alat,id',
+            'kondisi_saat_kembali' => 'sometimes|array',
+            'kondisi_saat_kembali.*' => 'required|string',
+            'denda_atau_sanksi' => 'nullable|string',
+            'catatan' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal.',
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        try {
+            DB::beginTransaction();
+
             $peminjaman = Peminjaman::findOrFail($id);
-            $detailAlat = PeminjamanDetailAlat::where('peminjaman_id', $id)->with('alat.laboratorium')->get();
+            $path_foto = null;
 
-            $peminjaman->update(['status_pengajuan' => 'selesai']);
+            if ($request->hasFile('bukti_pengembalian')) {
+                $path_foto = $request->file('bukti_pengembalian')->store('uploads/bukti_pengembalian', 'public');
+            }
 
-            foreach ($detailAlat as $detail) {
-                $detail->update(['status_pengembalian' => $request->status_pengembalian]);
+            $peminjaman->update([
+                'status_pengajuan' => 'selesai',
+                'bukti_pengembalian' => $path_foto,
+            ]);
+
+            if ($request->has('detail_id') && $request->has('kondisi_saat_kembali')) {
+                $detailIds = $request->detail_id;
+                $kondisiArray = $request->kondisi_saat_kembali;
+
+                foreach ($detailIds as $index => $detailId) {
+                    PeminjamanDetailAlat::where('id', $detailId)
+                        ->update([
+                            'kondisi_saat_kembali' => $kondisiArray[$index],
+                        ]);
+                }
             }
 
             Pengembalian::create([
@@ -553,12 +599,22 @@ class PeminjamanController extends Controller
                 'denda_atau_sanksi' => $request->denda_atau_sanksi,
                 'catatan' => $request->catatan,
             ]);
-        });
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Peminjaman selesai, alat dikembalikan.',
-        ]);
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Peminjaman selesai, fasilitas telah dikembalikan.',
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan sistem saat memproses data.',
+            ]);
+        }
     }
 
     public function indexRiwayat()

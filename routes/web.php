@@ -75,10 +75,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/monitoring', [PeminjamanController::class, 'indexMonitoring'])->name('monitoring');
             Route::get('/listMonitoring', [PeminjamanController::class, 'listMonitoring'])->name('listMonitoring');
             Route::get('{id}/showMonitoring', [PeminjamanController::class, 'showMonitoring'])->name('showMonitoring');
-            Route::get('{id}/editMonitoring', [PeminjamanController::class, 'editMonitoring'])->name('editMonitoring');
             Route::get('{id}/pengambilanMonitoring', [PeminjamanController::class, 'pengambilanMonitoring'])->name('pengambilanMonitoring');
             Route::post('/{id}/prosesPengambilan', [PeminjamanController::class, 'prosesPengambilan'])->name('prosesPengambilan');
-            Route::post('/{id}/kembali', [PeminjamanController::class, 'prosesPengembalian'])->name('kembali');
+            Route::get('{id}/pengembalianMonitoring', [PeminjamanController::class, 'pengembalianMonitoring'])->name('pengembalianMonitoring');
+            Route::post('/{id}/prosesPengembalian', [PeminjamanController::class, 'prosesPengembalian'])->name('prosesPengembalian');
 
             Route::get('/riwayat-admin', [PeminjamanController::class, 'indexRiwayat'])->name('riwayat');
             Route::get('/listRiwayat', [PeminjamanController::class, 'listRiwayat'])->name('listRiwayat');

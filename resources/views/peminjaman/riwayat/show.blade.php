@@ -1,6 +1,6 @@
-<div class="relative w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+<div class="relative w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg flex flex-col max-h-[90vh]">
 
-    <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
+    <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50 shrink-0">
         <h5 class="text-lg font-semibold text-gray-800">Detail Peminjaman</h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors" onclick="hideModal()">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -8,7 +8,9 @@
             </svg>
         </button>
     </div>
-    <div class="p-6 space-y-6">
+
+    <div class="p-6 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
+
         <div class="bg-blue-50 rounded-lg border border-blue-100 p-4">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
                 <div class="md:col-span-2">
@@ -82,6 +84,7 @@
                 </div>
             @endif
         </div>
+
         <div>
             <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">Daftar Alat Diajukan</h3>
 
@@ -132,9 +135,24 @@
             </label>
             <div rows="3"
                 class="w-full rounded-md bg-gray-100 border-gray-300 shadow-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border">
-                {{ $peminjaman->catatan_admin ?? 'Tidak ada catatan' }}</textarea>
+                {{ $peminjaman->catatan_admin ?? 'Tidak ada catatan' }}
             </div>
         </div>
+
+        {{-- BAGIAN BUKTI PENGAMBILAN (Menyusul jika status >= dipinjam) --}}
+        @if ($peminjaman->bukti_pengambilan)
+            <div>
+                <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">Bukti Pengambilan (Awal)</h3>
+                <div
+                    class="mt-2 rounded-lg border border-gray-200 bg-gray-50 p-2 flex flex-col items-center justify-center">
+                    <a href="{{ asset('storage/' . $peminjaman->bukti_pengambilan) }}" target="_blank"
+                        class="block w-full text-center">
+                        <img src="{{ asset('storage/' . $peminjaman->bukti_pengambilan) }}" alt="Bukti Pengambilan"
+                            class="max-h-64 object-contain mx-auto rounded-md shadow-sm hover:opacity-90 transition-opacity cursor-pointer border border-gray-300">
+                    </a>
+                </div>
+            </div>
+        @endif
 
         {{-- BAGIAN PENGEMBALIAN --}}
         @if ($peminjaman->pengembalian)
@@ -149,8 +167,6 @@
 
                 @php
                     $isLate = $peminjaman->pengembalian->status_pengembalian === 'terlambat';
-
-                    // Config warna berdasarkan status
                     $theme = $isLate
                         ? [
                             'bg' => 'bg-red-50',
@@ -168,7 +184,7 @@
                         ];
                 @endphp
 
-                <div class="rounded-xl border {{ $theme['border'] }} {{ $theme['bg'] }} overflow-hidden">
+                <div class="rounded-xl border {{ $theme['border'] }} {{ $theme['bg'] }} overflow-hidden mb-6">
                     <div class="p-5">
                         <div class="flex flex-col md:flex-row gap-6">
 
@@ -251,6 +267,30 @@
                         </div>
                     </div>
                 </div>
+
+                <h4 class="text-sm font-bold text-gray-800 mb-2 mt-4 border-b pb-1">Lampiran Foto Bukti Pengembalian
+                </h4>
+                @if ($peminjaman->bukti_pengembalian)
+                    <div
+                        class="mt-2 rounded-lg border border-gray-200 bg-gray-50 p-2 flex flex-col items-center justify-center">
+                        <a href="{{ asset('storage/' . $peminjaman->bukti_pengembalian) }}" target="_blank"
+                            class="block w-full text-center">
+                            <img src="{{ asset('storage/' . $peminjaman->bukti_pengembalian) }}"
+                                alt="Bukti Pengembalian"
+                                class="max-h-64 object-contain mx-auto rounded-md shadow-sm hover:opacity-90 transition-opacity cursor-pointer border border-gray-300">
+                        </a>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Klik gambar untuk ukuran penuh
+                        </p>
+                    </div>
+                @else
+                    <div
+                        class="flex flex-col items-center justify-center py-6 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
+                        <i class="fa-solid fa-image text-2xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-500 font-medium text-sm">Bukti foto pengembalian tidak diunggah</p>
+                    </div>
+                @endif
             </div>
         @endif
     </div>
+</div>
