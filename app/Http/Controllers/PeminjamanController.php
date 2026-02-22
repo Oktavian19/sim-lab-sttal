@@ -76,11 +76,11 @@ class PeminjamanController extends Controller
         try {
             $peminjaman = Peminjaman::create([
                 'id_peminjam' => Auth::id(),
-                'id_lab' => $idLabToSave, 
+                'id_lab' => $idLabToSave,
                 'start_time' => $startDateTime,
                 'end_time' => $endDateTime,
                 'kegiatan' => $request->kegiatan,
-                'jumlah_peserta' => $pesertaToSave, 
+                'jumlah_peserta' => $pesertaToSave,
                 'status_pengajuan' => 'pending',
             ]);
 
@@ -364,7 +364,7 @@ class PeminjamanController extends Controller
     public function listMonitoring()
     {
         $peminjaman = Peminjaman::with($this->relations)
-            ->where('status_pengajuan', 'disetujui')
+            ->whereIn('status_pengajuan', ['disetujui', 'dipinjam'])
             ->orderBy('start_time', 'desc')
             ->get();
 
@@ -420,18 +420,27 @@ class PeminjamanController extends Controller
             })
 
             ->addColumn('aksi', function ($peminjaman) {
-                return '
-            <div class="flex items-center justify-center gap-3">
-                <a href="/peminjaman/'.$peminjaman->id.'/showMonitoring" onclick="modalAction(this.href); return false;"
-                    class="text-slate-500 hover:text-blue-600 bg-slate-100 p-2 rounded-md">
-                    <i class="fa-solid fa-eye"></i> Detail
-                </a>
-                <a href="/peminjaman/'.$peminjaman->id.'/editMonitoring" onclick="modalAction(this.href); return false;"
-                    class="text-slate-500 hover:text-green-600 bg-slate-100 p-2 rounded-md">
-                    <i class="fa-solid fa-pen-to-square"></i> Kembali
-                </a>
-            </div>
-            ';
+                $html = '<div class="flex items-center justify-center gap-3">';
+
+                $html .= '<a href="/peminjaman/'.$peminjaman->id.'/showMonitoring" onclick="modalAction(this.href); return false;"
+                            class="text-slate-500 hover:text-blue-600 bg-slate-100 p-2 rounded-md" title="Detail">
+                            <i class="fa-solid fa-eye"></i>
+                          </a>';
+
+                if ($peminjaman->status_pengajuan == 'disetujui') {
+                    $html .= '<a href="/peminjaman/'.$peminjaman->id.'/pengambilanMonitoring" onclick="modalAction(this.href); return false;"
+                                class="text-slate-500 hover:text-amber-600 bg-slate-100 p-2 rounded-md" title="Proses Pengambilan">
+                                <i class="fa-solid fa-hand-holding"></i> Ambil
+                              </a>';
+                } elseif ($peminjaman->status_pengajuan == 'dipinjam') {
+                    $html .= '<a href="/peminjaman/'.$peminjaman->id.'/editMonitoring" onclick="modalAction(this.href); return false;"
+                                class="text-slate-500 hover:text-green-600 bg-slate-100 p-2 rounded-md" title="Proses Pengembalian">
+                                <i class="fa-solid fa-arrow-rotate-left"></i> Kembali
+                              </a>';
+                }
+
+                $html .= '</div>';
+                return $html;
             })
             ->rawColumns(['mulai_pinjam', 'peminjam', 'tenggat_waktu', 'kegiatan', 'jumlah_peserta', 'aksi'])
             ->make(true);
@@ -451,6 +460,77 @@ class PeminjamanController extends Controller
         $detailAlat = PeminjamanDetailAlat::where('peminjaman_id', $id)->with('alat.laboratorium')->get();
 
         return view('peminjaman.monitoring.edit', compact('peminjaman', 'detailAlat'));
+    }
+
+    public function pengambilanMonitoring($id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+        $detailAlat = PeminjamanDetailAlat::where('peminjaman_id', $id)->with('alat.laboratorium')->get();
+
+        return view('peminjaman.monitoring.pengambilan', compact('peminjaman', 'detailAlat'));
+    }
+
+    public function prosesPengambilan(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'bukti_pengambilan' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'detail_id' => 'sometimes|array',
+            'detail_id.*' => 'exists:peminjaman_detail_alat,id',
+            'kondisi_saat_pinjam' => 'sometimes|array',
+            'kondisi_saat_pinjam.*' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal.',
+                'errors' => $validator->errors()
+            ]);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $peminjaman = Peminjaman::findOrFail($id);
+
+            $path_foto = null;
+
+            if ($request->hasFile('bukti_pengambilan')) {
+                $path_foto = $request->file('bukti_pengambilan')->store('uploads/bukti_pengambilan', 'public');
+            }
+
+            $peminjaman->update([
+                'status_pengajuan' => 'dipinjam',
+                'bukti_pengambilan' => $path_foto,
+            ]);
+
+
+            if ($request->has('detail_id') && $request->has('kondisi_saat_pinjam')) {
+                $detailIds = $request->detail_id;
+                $kondisiArray = $request->kondisi_saat_pinjam;
+
+                foreach ($detailIds as $index => $detailId) {
+                    PeminjamanDetailAlat::where('id', $detailId)
+                        ->update([
+                            'kondisi_saat_pinjam' => $kondisiArray[$index]
+                        ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Fasilitas berhasil diambil. Status diubah menjadi Dipinjam.',
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan sistem saat memproses data.',
+            ]);
+        }
     }
 
     public function prosesPengembalian(Request $request, $id)

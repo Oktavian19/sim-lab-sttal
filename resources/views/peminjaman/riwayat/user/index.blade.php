@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', 'Riwayat Peminjaman - SIM LAB STTAL Admin')
+@section('header', 'Riwayat Peminjaman')
+
 @section('content')
     <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50">
 

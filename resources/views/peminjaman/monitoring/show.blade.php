@@ -1,6 +1,6 @@
-<div class="relative w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+<div class="relative w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg flex flex-col max-h-[90vh]">
 
-    <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
+    <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50 shrink-0">
         <h5 class="text-lg font-semibold text-gray-800">Detail Peminjaman</h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors" onclick="hideModal()">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -8,7 +8,7 @@
             </svg>
         </button>
     </div>
-    <div class="p-6 space-y-6">
+    <div class="p-6 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
         <div class="bg-blue-50 rounded-lg border border-blue-100 p-4">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
                 <div class="md:col-span-2">
@@ -133,4 +133,34 @@
                 {{ $peminjaman->catatan_admin ?? 'Tidak ada catatan' }}
             </div>
         </div>
+
+        @if ($peminjaman->status_pengajuan == 'dipinjam')
+            <div>
+                <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">
+                    Bukti Pengambilan
+                </h3>
+
+                @if ($peminjaman->bukti_pengambilan)
+                    <div
+                        class="mt-2 rounded-lg border border-gray-200 bg-gray-50 p-2 flex flex-col items-center justify-center">
+                        <a href="{{ asset('storage/' . $peminjaman->bukti_pengambilan) }}"
+                            target="_blank" class="block w-full text-center">
+                            <img src="{{ asset('storage/' . $peminjaman->bukti_pengambilan) }}"
+                                alt="Bukti Pengambilan"
+                                class="max-h-64 object-contain mx-auto rounded-md shadow-sm hover:opacity-90 transition-opacity cursor-pointer border border-gray-300">
+                        </a>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Klik gambar untuk melihat ukuran
+                            penuh
+                        </p>
+                    </div>
+                @else
+                    <div
+                        class="flex flex-col items-center justify-center py-6 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
+                        <i class="fa-solid fa-image text-2xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-500 font-medium text-sm">Bukti pengambilan tidak tersedia</p>
+                    </div>
+                @endif
+            </div>
+        @endif
     </div>
