@@ -194,8 +194,10 @@
                 </section>
 
                 <div class="pt-4 flex justify-end gap-3 border-t border-gray-100">
-                    <button type="button"
-                        class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium text-sm transition">Batal</button>
+                    <button type="reset"
+                        class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium text-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> Reset
+                    </button>
                     <button type="submit"
                         class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm font-medium text-sm flex items-center gap-2 transition">
                         <i class="fa-solid fa-paper-plane"></i> Ajukan Peminjaman
@@ -253,9 +255,9 @@
         }
 
         function checkLiveStock() {
-            let tanggal = $('#tanggal_peminjaman').val(); 
-            let start = $('#start_time').val(); 
-            let end = $('#end_time').val(); 
+            let tanggal = $('#tanggal_peminjaman').val();
+            let start = $('#start_time').val();
+            let end = $('#end_time').val();
 
             if (!tanggal || !start || !end) return;
 
@@ -283,7 +285,8 @@
                             let qtyInput = item.find('.quantity-input');
                             let checkbox = item.find('.tool-checkbox');
 
-                            let currentStock = stocks[alatId] !== undefined ? stocks[alatId] : parseInt(stockLabel.data('original-stock'));
+                            let currentStock = stocks[alatId] !== undefined ? stocks[alatId] : parseInt(
+                                stockLabel.data('original-stock'));
 
                             stockLabel.text('Stok: ' + currentStock);
                             qtyInput.attr('max', currentStock);
@@ -363,6 +366,35 @@
                     }
                 });
                 $('#toolSearch').trigger('keyup');
+            });
+
+            $('#loanForm').on('reset', function() {
+                datePicker.clear();
+                timeStartPicker.clear();
+                timeEndPicker.clear();
+
+                $('#peserta_wrapper').slideDown();
+                $('#no-lab-msg').removeClass('hidden');
+                $('.tool-item').addClass('hidden').removeClass(
+                    'bg-blue-50 opacity-50 pointer-events-none cursor-not-allowed');
+                $('.checkbox-indicator').removeClass('bg-blue-600 border-blue-600').addClass(
+                    'bg-white border-gray-300');
+                $('.quantity-container').addClass('hidden');
+                $('.quantity-input').val(1).removeAttr('required');
+
+                let validator = $(this).validate();
+                validator.resetForm();
+                $('.border-red-500').removeClass('border-red-500 ring-red-200').addClass('border-gray-300');
+                $('[id^="error-"]').empty();
+
+                setTimeout(() => {
+                    $('#peserta_wrapper').slideDown();
+                    $('#jumlah_peserta').prop('required', true);
+                    $('#label-lab').html('Lokasi (Laboratorium)');
+                    $('#label-alat').html('Peminjaman Alat (Opsional)');
+
+                    updateToolCount();
+                }, 10);
             });
 
             $('#toolSearch').on('keyup', function(e) {

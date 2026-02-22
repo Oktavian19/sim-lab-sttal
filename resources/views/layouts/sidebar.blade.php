@@ -15,7 +15,8 @@
         </div>
     </div>
 
-    <a href="{{ route('profile.edit') }}" class="p-4 border-b border-slate-700 flex items-center gap-3 bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer group">
+    <a href="{{ route('profile.edit') }}"
+        class="p-4 border-b border-slate-700 flex items-center gap-3 bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer group">
         @if (auth()->user()->photo_path)
             <img src="{{ asset('storage/' . auth()->user()->photo_path) }}" alt="User Avatar"
                 class="w-10 h-10 rounded-full object-cover border border-slate-600">
@@ -111,43 +112,24 @@
                 <span class="text-sm font-medium">Laporan Kerusakan</span>
             </a>
         @else
-            <p class="px-6 mt-6 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Layanan Laboratorium</p>
+            <p class="px-6 mt-6 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Peminjaman</p>
 
-            @php $isUserBookingOpen = request()->routeIs('peminjaman.*'); @endphp
-            <div x-data="{ open: {{ $isUserBookingOpen ? 'true' : 'false' }} }" @click.outside="open = false">
-                <button @click="open = !open"
-                    class="w-full flex items-center px-6 py-2.5 transition-colors group {{ $isUserBookingOpen ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
-                    <i class="fa-solid fa-users w-6 group-hover:text-blue-400 transition-colors"></i>
-                    <span class="text-sm font-medium">Peminjaman</span>
-                    <i class="fa-solid fa-chevron-down ml-auto text-xs transition-transform duration-200"
-                        :class="{ 'rotate-180': open }">
-                    </i>
-                </button>
-
-                <div x-show="open" x-collapse class="bg-slate-900 pl-12 py-2 space-y-1">
-                    <a href="{{ route('peminjaman.schedule') }}"
-                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('peminjaman.schedule') ? 'text-white font-semibold' : 'text-slate-400' }}">
-                        Jadwal Peminjaman
-                    </a>
-                    <a href="{{ route('peminjaman.create') }}"
-                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('peminjaman.create') ? 'text-white font-semibold' : 'text-slate-400' }}">
-                        Ajukan Peminjaman
-                    </a>
-                    <a href="{{ route('peminjaman.riwayatUser') }}"
-                        class="block py-2 text-sm hover:text-white transition-colors {{ request()->routeIs('peminjaman.riwayatUser') ? 'text-white font-semibold' : 'text-slate-400' }}">
-                        Riwayat Peminjaman
-                    </a>
-                </div>
-            </div>
-
-            <a href="#" class="{{ request()->routeIs('alat.*') ? $activeClass : $inactiveClass }}">
-                <i class="fa-solid fa-list-check w-6 group-hover:text-blue-400 transition-colors"></i>
-                <span class="text-sm font-medium">Data Alat</span>
+            <a href="{{ route('peminjaman.schedule') }}"
+                class="{{ request()->routeIs('peminjaman.schedule') ? $activeClass : $inactiveClass }}">
+                <i class="fa-solid fa-calendar-days w-6 group-hover:text-blue-400 transition-colors"></i>
+                <span class="text-sm font-medium">Jadwal Peminjaman</span>
             </a>
 
-            <a href="#" class="{{ request()->routeIs('laboratorium.*') ? $activeClass : $inactiveClass }}">
-                <i class="fa-solid fa-list-check w-6 group-hover:text-blue-400 transition-colors"></i>
-                <span class="text-sm font-medium">Data Laboratorium</span>
+            <a href="{{ route('peminjaman.create') }}"
+                class="{{ request()->routeIs('peminjaman.create') ? $activeClass : $inactiveClass }}">
+                <i class="fa-solid fa-square-plus w-6 group-hover:text-blue-400 transition-colors"></i>
+                <span class="text-sm font-medium">Ajukan Peminjaman</span>
+            </a>
+
+            <a href="{{ route('peminjaman.riwayatUser') }}"
+                class="{{ request()->routeIs('peminjaman.riwayatUser') ? $activeClass : $inactiveClass }}">
+                <i class="fa-solid fa-clock-rotate-left w-6 group-hover:text-blue-400 transition-colors"></i>
+                <span class="text-sm font-medium">Riwayat Peminjaman</span>
             </a>
 
             <p class="px-6 mt-6 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Pusat Bantuan</p>
