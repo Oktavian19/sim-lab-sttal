@@ -4,9 +4,7 @@
 @section('header', 'Dashboard Admin')
 
 @section('content')
-    <!-- Main Content Scrollable Area -->
     <main class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
-        <!-- Welcome Banner -->
         <div
             class="shrink-0 bg-gradient-to-r from-blue-800 to-blue-600 rounded-lg shadow-lg p-6 mb-8 text-white relative overflow-hidden">
             <div class="relative z-10">
@@ -19,10 +17,7 @@
             <i class="fa-solid fa-flask absolute -bottom-4 -right-4 text-9xl text-white opacity-10 rotate-12"></i>
         </div>
 
-        <!-- Statistics Cards -->
         <div class="shrink-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-
-            <!-- Card 1: Total Alat -->
             <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500 hover:shadow-md transition-shadow">
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -39,7 +34,6 @@
                 </div>
             </div>
 
-            <!-- Card 2: Permohonan Pending -->
             <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-yellow-500 hover:shadow-md transition-shadow">
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -56,7 +50,6 @@
                 </div>
             </div>
 
-            <!-- Lab Sedang Dipakai -->
             <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-500 hover:shadow-md transition-shadow">
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -74,7 +67,6 @@
                 </div>
             </div>
 
-            <!-- Laporan Kerusakan -->
             <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-red-500 hover:shadow-md transition-shadow">
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -85,27 +77,30 @@
                         <i class="fa-solid fa-triangle-exclamation"></i>
                     </div>
                 </div>
+
                 <div class="text-xs text-slate-500">
-                    Baru masuk hari ini
+                    @if ($lapKerusakan['hari_ini'] > 0)
+                        <span class="text-red-500 font-bold">{{ $lapKerusakan['hari_ini'] }}</span> Baru masuk hari ini
+                    @else
+                        Tidak ada laporan baru hari ini
+                    @endif
                 </div>
             </div>
         </div>
 
-        <!-- Two Column Section -->
         <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            <!-- Tabel Validasi Peminjaman -->
-            <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-slate-200">
-                <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+            <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col h-[50vh]">
+                <div class="p-4 border-b border-slate-100 flex justify-between items-center shrink-0">
                     <h3 class="font-bold text-slate-800"><i class="fa-solid fa-list-check mr-2 text-blue-500"></i>Peminjaman
                         Perlu Persetujuan</h3>
                     <a href="{{ route('peminjaman.validasi') }}"
                         class="text-xs font-medium text-blue-600 hover:text-blue-800">Lihat Semua</a>
                 </div>
 
-                <div class="overflow-y-auto flex-1">
+                <div class="overflow-y-auto flex-1 relative">
                     <table class="w-full text-sm text-left text-slate-500">
-                        <thead class="text-xs text-slate-700 uppercase bg-slate-50 sticky top-0 shadow-sm">
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-50 sticky top-0 shadow-sm z-10">
                             <tr>
                                 <th scope="col" class="px-6 py-3">Peminjam (User)</th>
                                 <th scope="col" class="px-6 py-3">Kegiatan</th>
@@ -150,10 +145,8 @@
                 </div>
             </div>
 
-            <!-- Kolom Kanan: Status Lab & Jadwal Hari Ini -->
-            <div class="lg:col-span-1 flex flex-col space-y-6 min-h-0">
+            <div class="lg:col-span-1 flex flex-col space-y-6 h-[50vh]">
 
-                <!-- Status Ketersediaan Lab -->
                 <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 flex-1 flex flex-col overflow-hidden">
                     <h3 class="font-bold text-slate-800 mb-4 text-sm shrink-0">Status Laboratorium</h3>
                     <div class="space-y-3 overflow-y-auto flex-1 pr-2">
@@ -180,7 +173,6 @@
                                 }
                             @endphp
 
-
                             <div class="flex items-center justify-between p-2 rounded border-l-4 mb-2 {{ $statusClass }}">
                                 <div>
                                     <p class="text-sm font-semibold text-slate-700">{{ $item->nama_lab }}</p>
@@ -200,7 +192,6 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
                 <div class="bg-slate-800 rounded-lg shadow-sm p-4 text-white shrink-0">
                     <h3 class="font-bold mb-3 text-sm">Aksi Cepat</h3>
                     <div class="grid grid-cols-2 gap-2">

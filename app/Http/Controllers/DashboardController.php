@@ -30,7 +30,7 @@ class DashboardController extends Controller
                 ];
                 $peminjaman = [
                     'validasi' => Peminjaman::where('status_pengajuan', 'pending')->count(),
-                    'validasiData' => Peminjaman::with('laboratorium')->where('status_pengajuan', 'pending')->limit(6)->orderBy('start_time', 'asc')->get(),
+                    'validasiData' => Peminjaman::with('laboratorium')->where('status_pengajuan', 'pending')->orderBy('start_time', 'asc')->get(),
                 ];
                 $activeLoans = Peminjaman::where('status_pengajuan', 'disetujui')
                     ->where('start_time', '<=', $now)
@@ -45,7 +45,8 @@ class DashboardController extends Controller
                     'labData' => Laboratorium::all(),
                 ];
                 $lapKerusakan = [
-                    'total' => PelaporanKerusakan::count(),
+                    'total' => PelaporanKerusakan::whereIn('status_tindak_lanjut', ['menunggu', 'sedang_diperbaiki'])->count(),
+                    'hari_ini' => PelaporanKerusakan::whereDate('tanggal_lapor', $now->toDateString())->count(),
                 ];
 
                 return view('dashboard.admin', compact('alat', 'peminjaman', 'jadwalHariIni', 'lab', 'lapKerusakan'));
