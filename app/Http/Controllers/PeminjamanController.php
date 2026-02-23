@@ -313,6 +313,7 @@ class PeminjamanController extends Controller
         $conflictErrors = Peminjaman::checkAvailability(
             $peminjaman->id_lab,
             $alatIds,
+            [],
             $peminjaman->start_time,
             $peminjaman->end_time,
             $peminjaman->id
