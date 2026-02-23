@@ -1,4 +1,5 @@
-<form action="{{ url('peminjaman/' . $peminjaman->id . '/prosesPengembalian') }}" method="POST" id="form-return" class="w-full validate" enctype="multipart/form-data">
+<form action="{{ url('peminjaman/' . $peminjaman->id . '/prosesPengembalian') }}" method="POST" id="form-return"
+    class="w-full validate" enctype="multipart/form-data">
     @csrf
     <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg flex flex-col max-h-[90vh]">
 
@@ -6,7 +7,8 @@
             <h5 class="text-lg font-semibold text-gray-800">Proses Pengembalian</h5>
             <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors" onclick="hideModal()">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
                 </svg>
             </button>
         </div>
@@ -14,8 +16,11 @@
         <div class="px-6 py-4 space-y-5 overflow-y-auto flex-1 custom-scrollbar">
 
             <div class="bg-blue-50 border border-blue-100 rounded-md p-4 text-sm text-gray-700">
-                <p>Memproses pengembalian dari: <span id="returnPeminjamName" class="font-semibold text-gray-900">{{ $peminjaman->peminjam->nama }}</span></p>
-                <p class="mt-1">Tenggat Waktu: <span id="returnDeadline" class="font-mono font-medium text-red-600">{{ $peminjaman->end_time->translatedFormat('d F Y H:i') }}</span></p>
+                <p>Memproses pengembalian dari: <span id="returnPeminjamName"
+                        class="font-semibold text-gray-900">{{ $peminjaman->peminjam->nama }}</span></p>
+                <p class="mt-1">Tenggat Waktu: <span id="returnDeadline"
+                        class="font-mono font-medium text-red-600">{{ $peminjaman->end_time->translatedFormat('d F Y H:i') }}</span>
+                </p>
             </div>
 
             <div>
@@ -38,7 +43,8 @@
                     <input type="text" name="tanggal_kembali_realisasi" id="realisasiDate"
                         data-deadline="{{ $peminjaman->end_time->format('Y-m-d H:i:s') }}"
                         data-start-time="{{ $peminjaman->start_time->format('Y-m-d H:i:s') }}"
-                        class="bg-white mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-200" required>
+                        class="bg-white mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        required>
                     <p id="error-tanggal_kembali_realisasi" class="mt-1 text-sm text-red-600 error-text"></p>
                 </div>
 
@@ -47,16 +53,19 @@
                         Status Pengembalian
                     </label>
                     <select name="status_pengembalian" id="status_pengembalian"
-                        class="mt-1 block w-full rounded-md bg-gray-100 border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-200 pointer-events-none" readonly>
+                        class="mt-1 block w-full rounded-md bg-gray-100 border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-200 pointer-events-none"
+                        readonly>
                         <option value="tepat_waktu">Tepat Waktu</option>
                         <option value="terlambat">Terlambat</option>
                     </select>
                 </div>
             </div>
 
-            <div id="warning-terlambat" class="hidden mt-2 p-3 bg-red-50 border border-red-200 rounded-md flex items-start">
+            <div id="warning-terlambat"
+                class="hidden mt-2 p-3 bg-red-50 border border-red-200 rounded-md flex items-start">
                 <svg class="h-5 w-5 text-red-600 mt-0.5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
                 <div>
                     <p class="text-sm font-bold text-red-700">Terlambat!</p>
@@ -64,17 +73,19 @@
                 </div>
             </div>
 
-            @if($detailAlat->isNotEmpty())
+            @if ($detailAlat->isNotEmpty())
                 <div>
                     <h6 class="text-sm font-bold text-gray-800 border-b pb-2 mb-3">Pengecekan Kondisi Alat</h6>
                     <div class="space-y-3">
-                        @foreach($detailAlat as $detail)
-                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                        @foreach ($detailAlat as $detail)
+                            <div
+                                class="flex flex-col md:flex-row md:items-center justify-between gap-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
                                 <div class="flex-1">
                                     <p class="text-sm font-medium text-gray-900">{{ $detail->alat->nama_alat }}</p>
                                     <div class="flex items-center gap-2 mt-1">
                                         <span class="text-xs text-gray-500">Jml: {{ $detail->jumlah }}</span>
-                                        <span class="text-xs px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
+                                        <span
+                                            class="text-xs px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
                                             Kondisi Pinjam: {{ $detail->kondisi_saat_pinjam ?? 'Tidak ada catatan' }}
                                         </span>
                                     </div>
@@ -98,7 +109,8 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
                 <div>
-                    <label for="denda_atau_sanksi" class="block text-sm font-medium text-gray-700">Denda / Sanksi (Opsional)</label>
+                    <label for="denda_atau_sanksi" class="block text-sm font-medium text-gray-700">Denda / Sanksi
+                        (Opsional)</label>
                     <input type="text" name="denda_atau_sanksi" id="denda_atau_sanksi" placeholder="Misal: Rp 50.000"
                         class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
                 </div>
@@ -112,10 +124,13 @@
         </div>
 
         <div class="flex justify-end gap-2 px-6 py-4 border-t bg-gray-50 rounded-b-lg shrink-0">
-            <button type="button" class="rounded-md bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" onclick="hideModal()">
+            <button type="button"
+                class="rounded-md bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                onclick="hideModal()">
                 Batal
             </button>
-            <button type="submit" class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit"
+                class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 Konfirmasi Selesai
             </button>
         </div>
@@ -124,6 +139,14 @@
 
 <script>
     $(document).ready(function() {
+        $.validator.addMethod('filesize', function(value, element, param) {
+            if (element.files.length === 0) {
+                return true;
+            }
+
+            return element.files[0].size <= param;
+        }, 'Ukuran file terlalu besar.');
+
         $.validator.addMethod("checkSemuaKondisiKembali", function(value, element) {
             let valid = true;
             $(".kondisi-kembali-select").each(function() {
@@ -135,13 +158,17 @@
         }, "Harap pilih kondisi kembali untuk semua alat.");
 
         $("#form-return").validate({
+            onfocusout: false,
+            onkeyup: false,
+            onclick: false,
             ignore: [],
             errorElement: "span",
             errorClass: "text-red-500 text-xs mt-1 block",
             rules: {
                 bukti_pengembalian: {
                     required: true,
-                    extension: "jpg|jpeg|png"
+                    extension: "jpg|jpeg|png",
+                    filesize: 2097152
                 },
                 tanggal_kembali_realisasi: {
                     required: true
@@ -153,7 +180,8 @@
             messages: {
                 bukti_pengembalian: {
                     required: "Bukti foto pengembalian wajib diunggah.",
-                    extension: "Hanya file gambar (JPG, JPEG, PNG)."
+                    extension: "Hanya file gambar (JPG, JPEG, PNG).",
+                    filesize: "Ukuran file terlalu besar (maksimal 2MB)."
                 },
                 tanggal_kembali_realisasi: {
                     required: "Tanggal realisasi pengembalian wajib diisi."

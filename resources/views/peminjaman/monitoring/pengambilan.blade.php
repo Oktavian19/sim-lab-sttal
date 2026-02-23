@@ -108,6 +108,14 @@
 
 <script>
     $(document).ready(function() {
+        $.validator.addMethod('filesize', function(value, element, param) {
+            if (element.files.length === 0) {
+                return true;
+            }
+
+            return element.files[0].size <= param;
+        }, 'Ukuran file terlalu besar.');
+
         $.validator.addMethod("checkSemuaKondisi", function(value, element) {
             let valid = true;
             $(".kondisi-select").each(function() {
@@ -119,13 +127,17 @@
         }, "Harap pilih kondisi untuk semua alat.");
 
         $("#form-pengambilan").validate({
+            onfocusout: false,
+            onkeyup: false,
+            onclick: false,
             ignore: [],
             errorElement: "span",
             errorClass: "text-red-500 text-xs font-medium mt-1.5 block",
             rules: {
                 bukti_pengambilan: {
                     required: true,
-                    extension: "jpg|jpeg|png"
+                    extension: "jpg|jpeg|png",
+                    filesize: 2097152
                 },
                 "kondisi_saat_pinjam[]": {
                     checkSemuaKondisi: true
@@ -134,7 +146,8 @@
             messages: {
                 bukti_pengambilan: {
                     required: "Bukti foto pengambilan wajib diunggah.",
-                    extension: "Hanya menerima file gambar (JPG, JPEG, PNG)."
+                    extension: "Hanya menerima file gambar (JPG, JPEG, PNG).",
+                    filesize: "Ukuran file terlalu besar (maksimal 2MB)."
                 }
             },
             errorPlacement: function(error, element) {
@@ -145,6 +158,17 @@
                 } else {
                     error.insertAfter(element);
                 }
+            }
+        });
+
+        $(".kondisi-select").on('change', function() {
+            let semuaTerisi = true;
+            $(".kondisi-select").each(function() {
+                if ($(this).val() === "") semuaTerisi = false;
+            });
+
+            if (semuaTerisi) {
+                $("#error-kondisi_saat_pinjam").empty();
             }
         });
     });
