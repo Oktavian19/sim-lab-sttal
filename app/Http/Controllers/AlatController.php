@@ -24,6 +24,16 @@ class AlatController extends Controller
 
         return DataTables::of($alat)
             ->addIndexColumn()
+            ->filterColumn('nama_alat', function ($query, $keyword) {
+                $query->where('nama_alat', 'like', "%{$keyword}%")
+                    ->orWhere('merk', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('lokasi', function ($query, $keyword) {
+                $query->whereHas('laboratorium', function ($q) use ($keyword) {
+                    $q->where('nama_lab', 'like', "%{$keyword}%");
+                });
+            })
+
             ->addColumn('nama_alat', function ($alat) {
                 return '
                 <div class="font-medium text-slate-900">'.$alat->nama_alat.'</div>

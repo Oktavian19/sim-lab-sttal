@@ -22,6 +22,24 @@ class PelaporanKerusakanController extends Controller
 
         return DataTables::of($laporan)
             ->addIndexColumn()
+            ->filterColumn('pelapor', function ($query, $keyword) {
+                $query->whereHas('pelapor', function ($q) use ($keyword) {
+                    $q->where('nama', 'like', "%{$keyword}%")
+                        ->orWhere('nrp', 'like', "%{$keyword}%")
+                        ->orWhere('pangkat', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('alat', function ($query, $keyword) {
+                $query->whereHas('alat', function ($q) use ($keyword) {
+                    $q->where('nama_alat', 'like', "%{$keyword}%")
+                        ->orWhereHas('laboratorium', function ($q2) use ($keyword) {
+                            $q2->where('nama_lab', 'like', "%{$keyword}%");
+                        });
+                });
+            })
+            ->filterColumn('status', function ($query, $keyword) {
+                $query->where('status_tindak_lanjut', 'like', "%{$keyword}%");
+            })
             ->addColumn('tanggal_lapor', function ($laporan) {
                 return '
                 <div class="text-slate-900 font-medium">'.$laporan->tanggal_lapor->translatedFormat('d M Y').'</div>

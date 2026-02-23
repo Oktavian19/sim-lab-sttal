@@ -214,11 +214,22 @@ class PeminjamanController extends Controller
     {
         $peminjaman = Peminjaman::with($this->relations)
             ->where('status_pengajuan', 'pending')
-            ->orderBy('created_at', 'asc')
-            ->get();
+            ->orderBy('created_at', 'asc');
 
         return DataTables::of($peminjaman)
             ->addIndexColumn()
+            ->filterColumn('peminjam', function ($query, $keyword) {
+                $query->whereHas('peminjam', function ($q) use ($keyword) {
+                    $q->where('nama', 'like', "%{$keyword}%")
+                        ->orWhere('nrp', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('kegiatan', function ($query, $keyword) {
+                $query->where('kegiatan', 'like', "%{$keyword}%")
+                    ->orWhereHas('laboratorium', function ($q) use ($keyword) {
+                        $q->where('nama_lab', 'like', "%{$keyword}%");
+                    });
+            })
             ->addColumn('tanggal_pengajuan', function ($peminjaman) {
                 return '
                 <div class="font-medium text-slate-900">'.$peminjaman->created_at->translatedFormat('d F Y').'</div>
@@ -365,11 +376,22 @@ class PeminjamanController extends Controller
     {
         $peminjaman = Peminjaman::with($this->relations)
             ->whereIn('status_pengajuan', ['disetujui', 'dipinjam'])
-            ->orderBy('start_time', 'desc')
-            ->get();
+            ->orderBy('start_time', 'desc');
 
         return DataTables::of($peminjaman)
             ->addIndexColumn()
+            ->filterColumn('peminjam', function ($query, $keyword) {
+                $query->whereHas('peminjam', function ($q) use ($keyword) {
+                    $q->where('nama', 'like', "%{$keyword}%")
+                        ->orWhere('nrp', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('kegiatan', function ($query, $keyword) {
+                $query->where('kegiatan', 'like', "%{$keyword}%")
+                    ->orWhereHas('laboratorium', function ($q) use ($keyword) {
+                        $q->where('nama_lab', 'like', "%{$keyword}%");
+                    });
+            })
             ->addColumn('mulai_pinjam', function ($peminjaman) {
                 return '
                 <div class="font-medium text-slate-900">'.$peminjaman->start_time->translatedFormat('d F Y').'</div>
@@ -492,7 +514,6 @@ class PeminjamanController extends Controller
 
         try {
             DB::beginTransaction();
-
 
             $path_foto = null;
 
@@ -626,11 +647,22 @@ class PeminjamanController extends Controller
     {
         $peminjaman = Peminjaman::with($this->relations)
             ->whereIn('status_pengajuan', ['selesai', 'ditolak', 'dibatalkan'])
-            ->orderBy('start_time', 'desc')
-            ->get();
+            ->orderBy('start_time', 'desc');
 
         return DataTables::of($peminjaman)
             ->addIndexColumn()
+            ->filterColumn('peminjam', function ($query, $keyword) {
+                $query->whereHas('peminjam', function ($q) use ($keyword) {
+                    $q->where('nama', 'like', "%{$keyword}%")
+                        ->orWhere('nrp', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('kegiatan', function ($query, $keyword) {
+                $query->where('kegiatan', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('status', function ($query, $keyword) {
+                $query->where('status_pengajuan', 'like', "%{$keyword}%");
+            })
             ->addColumn('tanggal_peminjaman', function ($peminjaman) {
                 $html = '
                 <div class="font-medium text-slate-900">'.$peminjaman->start_time->translatedFormat('d F Y').'</div>

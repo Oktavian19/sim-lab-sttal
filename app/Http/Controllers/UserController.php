@@ -31,6 +31,16 @@ class UserController extends Controller
 
         return DataTables::of($user)
             ->addIndexColumn()
+            ->filterColumn('nrp', function ($query, $keyword) {
+                $query->where('nrp', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('nama', function ($query, $keyword) {
+                $query->where('nama', 'like', "%{$keyword}%");
+            })
+            ->filterColumn('pangkat_korps', function ($query, $keyword) {
+                $query->where('pangkat', 'like', "%{$keyword}%")
+                    ->orWhere('korps', 'like', "%{$keyword}%");
+            })
             ->addColumn('nrp', function ($user) {
                 return '
                 <div class="font-medium text-slate-900">'.$user->nrp.'</div>
