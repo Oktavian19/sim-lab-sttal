@@ -51,7 +51,28 @@ class DashboardController extends Controller
 
                 return view('dashboard.admin', compact('alat', 'peminjaman', 'jadwalHariIni', 'lab', 'lapKerusakan'));
             case 'user':
-                return view('dashboard.user');
+                $userId = Auth::id();
+
+                $countPinjamanAktif = Peminjaman::where('id_peminjam', $userId)
+                    ->whereIn('status_pengajuan', ['disetujui', 'dipinjam'])
+                    ->count();
+
+                $countPending = Peminjaman::where('id_peminjam', $userId)
+                    ->where('status_pengajuan', 'pending')
+                    ->count();
+
+                $pinjamanAktif = Peminjaman::with('laboratorium')
+                    ->where('id_peminjam', $userId)
+                    ->whereIn('status_pengajuan', ['disetujui', 'dipinjam'])
+                    ->orderBy('start_time', 'asc')
+                    ->get();
+
+                $notifikasi = Peminjaman::where('id_peminjam', $userId)
+                    ->orderBy('updated_at', 'desc')
+                    ->take(5)
+                    ->get();
+
+                return view('dashboard.user', compact('countPinjamanAktif', 'countPending', 'pinjamanAktif', 'notifikasi'));
             default:
                 return abort(403);
         }

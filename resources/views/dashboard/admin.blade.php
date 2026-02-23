@@ -92,8 +92,9 @@
 
             <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col h-[50vh]">
                 <div class="p-4 border-b border-slate-100 flex justify-between items-center shrink-0">
-                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-list-check mr-2 text-blue-500"></i>Peminjaman
-                        Perlu Persetujuan</h3>
+                    <h3 class="font-bold text-slate-800">
+                        <i class="fa-solid fa-list-check mr-2 text-blue-500"></i>Peminjaman Perlu Persetujuan
+                    </h3>
                     <a href="{{ route('peminjaman.validasi') }}"
                         class="text-xs font-medium text-blue-600 hover:text-blue-800">Lihat Semua</a>
                 </div>
@@ -104,12 +105,13 @@
                             <tr>
                                 <th scope="col" class="px-6 py-3">Peminjam (User)</th>
                                 <th scope="col" class="px-6 py-3">Kegiatan</th>
+                                <th scope="col" class="px-6 py-3">Laboratorium</th>
                                 <th scope="col" class="px-6 py-3">Waktu Pinjam</th>
-                                <th scope="col" class="px-6 py-3">Jumlah Peserta</th>
+                                <th scope="col" class="px-6 py-3 text-center">Jumlah Peserta</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            @foreach ($peminjaman['validasiData'] as $item)
+                            @forelse ($peminjaman['validasiData'] as $item)
                                 <tr class="bg-white border-b hover:bg-slate-50">
                                     <td class="px-6 py-4">
                                         <div class="font-medium text-slate-900">{{ $item->peminjam->nama }}</div>
@@ -118,8 +120,10 @@
 
                                     <td class="px-6 py-4">
                                         <div class="font-medium text-slate-900">{{ $item->kegiatan }}</div>
-                                        <div class="text-xs text-slate-400">
-                                            {{ $item->laboratorium->nama_lab ?? 'Hanya peminjaman alat' }}</div>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        <div class="font-medium text-slate-900">{{ $item->laboratorium->nama_lab ?? 'Hanya peminjaman alat' }}</div>
                                     </td>
 
                                     <td class="px-6 py-4">
@@ -137,9 +141,23 @@
                                             @endif
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4">{{ $item->jumlah_peserta }} Orang</td>
+                                    <td class="px-6 py-4 text-center">{{ $item->jumlah_peserta }} Orang</td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-6 py-16 text-center">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <div class="bg-slate-50 p-4 rounded-full mb-3">
+                                                <i class="fa-solid fa-clipboard-check text-4xl text-slate-300"></i>
+                                            </div>
+                                            <span class="text-slate-600 font-medium text-base">Tidak ada antrean
+                                                validasi</span>
+                                            <span class="text-slate-400 text-xs mt-1">Semua pengajuan peminjaman saat ini
+                                                telah diproses.</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
