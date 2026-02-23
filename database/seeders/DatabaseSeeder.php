@@ -18,10 +18,10 @@ class DatabaseSeeder extends Seeder
             UsersSeeder::class,
             LaboratoriumSeeder::class,
             AlatSeeder::class,
-            PeminjamanSeeder::class,
-            PeminjamanDetailAlatSeeder::class,
-            PelaporanKerusakanSeeder::class,
-            PengembalianSeeder::class,
+            // PeminjamanSeeder::class,
+            // PeminjamanDetailAlatSeeder::class,
+            // PelaporanKerusakanSeeder::class,
+            // PengembalianSeeder::class,
         ]);
     }
 }

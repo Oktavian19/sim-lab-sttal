@@ -24,16 +24,6 @@ class UsersSeeder extends Seeder
             'role' => 'admin',
         ]);
         User::create([
-            'nrp' => 'KLB001',
-            'nama' => 'Kepala Laboratorium',
-            'password' => Hash::make('password'),
-            'pangkat' => 'Mayor',
-            'korps' => 'Teknik',
-            'jurusan' => 'Elektro',
-            'no_telepon' => '081298765432',
-            'role' => 'admin',
-        ]);
-        User::create([
             'nrp' => 'USR001',
             'nama' => 'Taruna Contoh',
             'password' => Hash::make('password'),
