@@ -30,6 +30,10 @@
                             'class' => 'bg-blue-100 text-blue-800 border-blue-200',
                             'label' => 'Disetujui (Aktif)',
                         ],
+                        'dipinjam' => [
+                            'class' => 'bg-blue-100 text-blue-800 border-blue-200',
+                            'label' => 'Dipinjam',
+                        ],
                         'selesai' => ['class' => 'bg-green-100 text-green-800 border-green-200', 'label' => 'Selesai'],
                         'ditolak' => ['class' => 'bg-red-100 text-red-800 border-red-200', 'label' => 'Ditolak'],
                         'dibatalkan' => [

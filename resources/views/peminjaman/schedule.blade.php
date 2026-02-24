@@ -63,13 +63,12 @@
                                 class="min-w-64 px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider w-64 sticky left-0 bg-gray-50 z-20 border-r border-gray-200 shadow-sm">
                                 <span id="resourceHeader">Nama Laboratorium</span>
                             </th>
-                            <script>
-                                for (let i = 0; i <= 23; i++) {
-                                    document.write(
-                                        `<th class="px-2 py-3 text-center text-xs font-medium text-slate-400 w-24 border-r border-gray-100 last:border-0">${i.toString().padStart(2, '0')}:00</th>`
-                                    );
-                                }
-                            </script>
+                            @for ($i = 0; $i <= 23; $i++)
+                                <th
+                                    class="px-2 py-3 text-center text-xs font-medium text-slate-400 w-24 border-r border-gray-100 last:border-0">
+                                    {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}:00
+                                </th>
+                            @endfor
                         </tr>
                     </thead>
                     <tbody id="schedulerBody" class="divide-y divide-gray-200">
@@ -113,6 +112,7 @@
         // --- STATE & CONFIG ---
         let viewMode = 'lab';
         let selectedDate = new Date();
+        let mappedBookings = {};
 
         const hours = Array.from({
             length: 24
@@ -130,7 +130,6 @@
         });
 
         // --- FUNCTIONS ---
-
         function updateDatePicker() {
             const year = selectedDate.getFullYear();
             const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
@@ -140,7 +139,6 @@
 
         function setViewMode(mode) {
             viewMode = mode;
-
             const btnLab = document.getElementById('btn-lab');
             const btnAlat = document.getElementById('btn-alat');
             const header = document.getElementById('resourceHeader');
@@ -167,56 +165,56 @@
             renderGrid();
         }
 
-        function checkAvailability(resourceId, hour, type) {
-            const year = selectedDate.getFullYear();
-            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-            const day = String(selectedDate.getDate()).padStart(2, '0');
-            const selectedDateStr = `${year}-${month}-${day}`;
+        function mapBookingsForCurrentDate() {
+            mappedBookings = {
+                lab: {},
+                alat: {}
+            };
+            const targetDateStr = document.getElementById('datePicker').value;
 
-            const foundBooking = MOCK_PEMINJAMAN.find(b => {
-                const bookingStart = new Date(b.start_time);
-                const bookingEnd = new Date(b.end_time);
+            MOCK_PEMINJAMAN.forEach(b => {
+                const [bookingDate, bookingTime] = b.start_time.split(' ');
 
-                const bookingDateStr = bookingStart.toISOString().split('T')[0];
+                if (bookingDate !== targetDateStr) return;
 
-                if (bookingDateStr !== selectedDateStr) return false;
+                const startHour = parseInt(bookingTime.split(':')[0], 10);
+                let endHour = parseInt(b.end_time.split(' ')[1].split(':')[0], 10);
+                const endMinutes = parseInt(b.end_time.split(' ')[1].split(':')[1], 10);
 
-                let isResourceMatch = false;
-                if (type === 'lab') {
-                    isResourceMatch = (b.id_lab == resourceId);
-                } else {
-                    isResourceMatch = b.alat_dipinjam && b.alat_dipinjam.hasOwnProperty(resourceId);
+                if (endMinutes > 0) endHour += 1;
+
+                const isApproved = b.status_pengajuan === 'disetujui' || b.status_pengajuan === 'dipinjam';
+                const colorClass = isApproved ?
+                    'bg-green-100 border-green-200 text-green-800 hover:bg-green-200' :
+                    'bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100';
+
+                if (b.id_lab) {
+                    if (!mappedBookings.lab[b.id_lab]) mappedBookings.lab[b.id_lab] = {};
+                    for (let h = startHour; h < endHour; h++) {
+                        mappedBookings.lab[b.id_lab][h] = {
+                            ...b,
+                            colorClass
+                        };
+                    }
                 }
 
-                if (!isResourceMatch) return false;
-
-                const startHour = bookingStart.getHours();
-
-                let endHour = bookingEnd.getHours();
-
-                if (bookingEnd.getMinutes() > 0 || bookingEnd.getSeconds() > 0) {
-                    endHour += 1;
+                if (b.alat_dipinjam) {
+                    for (const [alatId, qty] of Object.entries(b.alat_dipinjam)) {
+                        if (!mappedBookings.alat[alatId]) mappedBookings.alat[alatId] = {};
+                        for (let h = startHour; h < endHour; h++) {
+                            mappedBookings.alat[alatId][h] = {
+                                ...b,
+                                colorClass,
+                                jumlah_dipinjam: qty
+                            };
+                        }
+                    }
                 }
-
-                return hour >= startHour && hour < endHour;
             });
-
-            if (!foundBooking) return null;
-
-            if (type === 'alat') {
-                return {
-                    ...foundBooking,
-                    jumlah_dipinjam: foundBooking.alat_dipinjam[resourceId]
-                };
-            }
-
-            return foundBooking;
         }
 
         function renderGrid() {
             const tbody = document.getElementById('schedulerBody');
-            tbody.innerHTML = '';
-
             const resources = viewMode === 'lab' ? MOCK_LABS : MOCK_ALAT;
 
             if (!resources || resources.length === 0) {
@@ -225,9 +223,12 @@
                 return;
             }
 
+            mapBookingsForCurrentDate();
+
+            let htmlBuilder = [];
+
             resources.forEach(res => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/50 transition-colors group/row";
+                htmlBuilder.push(`<tr class="hover:bg-slate-50/50 transition-colors group/row">`);
 
                 let badgeHTML = '';
                 let subText = '';
@@ -246,7 +247,7 @@
                     subText = `<i class="fa-solid fa-tag text-slate-400 mr-1"></i> ${res.merk || '-'}`;
                 }
 
-                const infoCell = `
+                htmlBuilder.push(`
                     <td class="px-6 py-4 sticky left-0 bg-white z-10 border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                         <div class="flex flex-col">
                             <span class="font-semibold text-slate-800 text-sm truncate w-48" title="${viewMode === 'lab' ? res.nama_lab : res.nama_alat}">
@@ -258,51 +259,48 @@
                             </div>
                         </div>
                     </td>
-                `;
-                tr.innerHTML += infoCell;
+                `);
+
+                const resourceSchedule = mappedBookings[viewMode][res.id] || {};
 
                 hours.forEach(hour => {
                     if (isMaintenance) {
-                        tr.innerHTML += `
-                            <td class="p-1 h-20 border-r border-gray-100 bg-gray-50 cursor-not-allowed">
-                                <div class="w-full h-full rounded bg-gray-200/50 flex items-center justify-center border border-dashed border-gray-300" title="Sedang Perbaikan">
-                                    <i class="fa-solid fa-screwdriver-wrench text-gray-400 text-xs"></i>
-                                </div>
-                            </td>`;
+                        htmlBuilder.push(`
+                    <td class="p-1 h-20 border-r border-gray-100 bg-gray-50 cursor-not-allowed">
+                        <div class="w-full h-full rounded bg-gray-200/50 flex items-center justify-center border border-dashed border-gray-300" title="Sedang Perbaikan">
+                            <i class="fa-solid fa-screwdriver-wrench text-gray-400 text-xs"></i>
+                        </div>
+                    </td>`);
                         return;
                     }
 
-                    const booking = checkAvailability(res.id, hour, viewMode);
+                    const booking = resourceSchedule[hour];
 
                     if (booking) {
-                        const isApproved = booking.status_pengajuan === 'disetujui' || booking
-                            .status_pengajuan === 'dipinjam';
-                        const colorClass = isApproved ?
-                            'bg-green-100 border-green-200 text-green-800 hover:bg-green-200' :
-                            'bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100';
-
-                        const bookingQuantity = viewMode === 'alat' ? booking.jumlah_dipinjam : null;
-
-                        tr.innerHTML += `
-                            <td class="p-1 h-20 border-r border-gray-100 relative group cursor-pointer" title="${booking.kegiatan} oleh ${booking.peminjam_nama}">
-                                <div class="flex flex-col justify-start w-full h-full rounded border px-1.5 py-1 text-[10px] leading-tight overflow-hidden ${colorClass} transition-colors shadow-sm">
+                        const qtyText = booking.jumlah_dipinjam ?
+                            `<div class="truncate opacity-75 text-[9px] mt-0.5">Jumlah: ${booking.jumlah_dipinjam}</div>` :
+                            '';
+                        htmlBuilder.push(`
+                            <td class="p-1 h-20 border-r border-gray-100 relative group cursor-pointer" title="${booking.kegiatan} oleh ${booking.peminjam_nama || 'User'}">
+                                <div class="flex flex-col justify-start w-full h-full rounded border px-1.5 py-1 text-[10px] leading-tight overflow-hidden ${booking.colorClass} transition-colors shadow-sm">
                                     <div class="font-bold truncate">${booking.kegiatan}</div>
                                     <div class="truncate opacity-75 text-[9px] mt-0.5">${booking.peminjam_nama || 'User'}</div>
-                                    ${bookingQuantity ? `<div class="truncate opacity-75 text-[9px] mt-0.5">Jumlah: ${bookingQuantity}</div>` : ''}
+                                    ${qtyText}
                                 </div>
-                            </td>`;
+                            </td>`);
                     } else {
-                        tr.innerHTML += `
+                        htmlBuilder.push(`
                             <td class="p-1 h-20 border-r border-gray-100 relative hover:bg-blue-50 transition-colors cursor-pointer group-cell">
-                                <div class="hidden group-hover/row:flex group-hover/row:items-center group-hover/row:justify-center w-full h-full text-slate-300 text-[10px]">
-                                    
-                                </div>
-                            </td>`;
+                                <div class="hidden group-hover/row:flex group-hover/row:items-center group-hover/row:justify-center w-full h-full text-slate-300 text-[10px]"></div>
+                            </td>`
+                        );
                     }
                 });
 
-                tbody.appendChild(tr);
+                htmlBuilder.push(`</tr>`);
             });
+
+            tbody.innerHTML = htmlBuilder.join('');
         }
     </script>
 @endpush

@@ -117,28 +117,38 @@ class PeminjamanController extends Controller
 
     public function schedule()
     {
-        $labs = Laboratorium::where('status', '!=', 'nonaktif')->get();
+        $labs = Laboratorium::select('id', 'nama_lab', 'status', 'kapasitas')
+            ->where('status', '!=', 'nonaktif')
+            ->get();
 
-        $alats = Alat::with('laboratorium')->get();
+        $alats = Alat::select('id', 'nama_alat', 'merk', 'jumlah', 'lokasi')
+            ->with(['laboratorium:id,nama_lab'])
+            ->get();
 
-        $peminjamans = Peminjaman::with(['peminjam', 'detailAlat'])
+        $startDate = now()->subMonth()->startOfMonth();
+        $endDate = now()->addMonths(2)->endOfMonth();
+
+        $peminjamans = Peminjaman::select('id', 'id_lab', 'id_peminjam', 'start_time', 'end_time', 'status_pengajuan', 'kegiatan')
+            ->with([
+                'peminjam:id,nama',
+                'detailAlat:id,peminjaman_id,id_alat,jumlah',
+            ])
             ->whereIn('status_pengajuan', ['pending', 'disetujui', 'dipinjam'])
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('start_time', [$startDate, $endDate])
+                    ->orWhereBetween('end_time', [$startDate, $endDate]);
+            })
             ->get()
             ->map(function ($item) {
-                $alatDipinjam = [];
-                foreach ($item->detailAlat as $detail) {
-                    $alatDipinjam[$detail->id_alat] = $detail->jumlah;
-                }
-
                 return [
                     'id' => $item->id,
                     'id_lab' => $item->id_lab,
-                    'start_time' => $item->start_time,
-                    'end_time' => $item->end_time,
+                    'start_time' => $item->start_time->format('Y-m-d H:i:s'),
+                    'end_time' => $item->end_time->format('Y-m-d H:i:s'),
                     'status_pengajuan' => $item->status_pengajuan,
                     'kegiatan' => $item->kegiatan,
-                    'peminjam_nama' => $item->peminjam->nama,
-                    'alat_dipinjam' => $alatDipinjam,
+                    'peminjam_nama' => $item->peminjam->nama ?? 'Tidak diketahui',
+                    'alat_dipinjam' => $item->detailAlat->pluck('jumlah', 'id_alat')->toArray(),
                 ];
             });
 
@@ -743,36 +753,39 @@ class PeminjamanController extends Controller
 
     public function checkAvailableStock(Request $request)
     {
-        $request->validate([
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
-        ]);
-
         $startTime = $request->start_time;
         $endTime = $request->end_time;
 
-        $alats = Alat::all();
-        $alatIds = $alats->pluck('id')->toArray();
+        if (! $startTime || ! $endTime) {
+            return response()->json(['status' => false, 'message' => 'Waktu tidak valid.']);
+        }
+
+        $bookedLabs = Peminjaman::activeCollision($startTime, $endTime)
+            ->whereNotNull('id_lab')
+            ->pluck('id_lab')
+            ->toArray();
 
         $borrowedTools = PeminjamanDetailAlat::selectRaw('id_alat, SUM(jumlah) as total_dipinjam')
             ->whereHas('peminjaman', function ($q) use ($startTime, $endTime) {
                 $q->activeCollision($startTime, $endTime);
             })
-            ->whereIn('id_alat', $alatIds)
             ->groupBy('id_alat')
-            ->get()
-            ->keyBy('id_alat');
+            ->pluck('total_dipinjam', 'id_alat')
+            ->toArray();
 
-        $availableStock = [];
-
-        foreach ($alats as $alat) {
-            $borrowedQty = $borrowedTools->has($alat->id) ? (int) $borrowedTools->get($alat->id)->total_dipinjam : 0;
-            $availableStock[$alat->id] = max(0, $alat->jumlah - $borrowedQty);
+        $allTools = Alat::all();
+        $stocks = [];
+        foreach ($allTools as $tool) {
+            $borrowed = $borrowedTools[$tool->id] ?? 0;
+            $stocks[$tool->id] = max(0, $tool->jumlah - $borrowed);
         }
 
         return response()->json([
             'status' => true,
-            'data' => $availableStock,
+            'data' => [
+                'stocks' => $stocks,
+                'booked_labs' => $bookedLabs,
+            ],
         ]);
     }
 }

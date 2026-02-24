@@ -24,8 +24,8 @@
 
         <div class="bg-slate-900 p-6 text-center border-b-4 border-blue-500">
             <div
-                class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-800 text-blue-400 mb-2 shadow-inner">
-                <i class="fa-solid fa-anchor text-2xl"></i>
+                class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-slate-800 text-blue-400 mb-2 shadow-inner">
+                <img src="{{ asset('images/logo.png') }}" alt="Icon" class="w-20 h-20 object-contain">
             </div>
             <h2 class="text-xl font-bold text-white tracking-wider">REGISTRASI <span class="text-blue-500">STTAL</span>
             </h2>

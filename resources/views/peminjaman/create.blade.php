@@ -94,15 +94,19 @@
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         @foreach ($labs as $lab)
-                            <label class="cursor-pointer group">
+                            <label class="cursor-pointer group lab-item" data-lab-id="{{ $lab->id }}">
                                 <input type="radio" name="id_lab" value="{{ $lab->id }}"
                                     class="peer sr-only lab-radio">
                                 <div
-                                    class="relative flex flex-col p-4 border border-gray-200 rounded-xl hover:border-blue-300 transition-all bg-white h-full peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:ring-2 peer-checked:ring-blue-100">
+                                    class="relative flex flex-col p-4 border border-gray-200 rounded-xl hover:border-blue-300 transition-all bg-white h-full peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:ring-2 peer-checked:ring-blue-100 peer-disabled:opacity-50 peer-disabled:bg-gray-100 peer-disabled:border-gray-200 peer-disabled:cursor-not-allowed">
                                     <div class="flex justify-between items-start mb-2">
                                         <span class="font-semibold text-gray-900 text-sm">{{ $lab->nama_lab }}</span>
                                         <span
-                                            class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold uppercase">{{ ucfirst($lab->status) }}</span>
+                                            class="lab-status-badge text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold uppercase"
+                                            data-original-status="{{ ucfirst($lab->status) }}"
+                                            data-original-class="bg-green-100 text-green-700">
+                                            {{ ucfirst($lab->status) }}
+                                        </span>
                                     </div>
                                     <p class="text-xs text-gray-500 mb-4 line-clamp-2">{{ $lab->deskripsi }}</p>
                                     <div class="mt-auto flex items-center gap-2 text-xs text-gray-600">
@@ -269,7 +273,7 @@
                 end_time: endDateTime
             };
 
-            $('#toolsContainer').css('opacity', '0.5');
+            $('#toolsContainer, .lab-item').css('opacity', '0.5');
 
             $.ajax({
                 url: "{{ route('peminjaman.check-stock') }}",
@@ -277,7 +281,45 @@
                 data: payload,
                 success: function(res) {
                     if (res.status) {
-                        let stocks = res.data;
+                        let stocks = res.data.stocks;
+                        let bookedLabs = res.data.booked_labs;
+
+                        let isHanyaAlat = $('#hanya_alat').is(':checked');
+
+                        $('.lab-item').each(function() {
+                            let item = $(this);
+                            let labId = parseInt(item.attr('data-lab-id'));
+                            let radio = item.find('.lab-radio');
+                            let badge = item.find('.lab-status-badge');
+
+                            let origStatus = badge.attr('data-original-status');
+                            let origClass = badge.attr('data-original-class');
+
+                            if (bookedLabs.includes(labId) && !isHanyaAlat) {
+                                item.addClass('pointer-events-none cursor-not-allowed');
+                                radio.prop('disabled', true);
+                                badge.removeClass(origClass).addClass('bg-red-100 text-red-700').text(
+                                    'DIPAKAI');
+
+                                if (radio.is(':checked')) {
+                                    radio.prop('checked', false);
+                                    radio.trigger('change');
+                                    $('#error-id_lab').text(
+                                            'Ruangan lab ini tidak tersedia pada jam yang Anda pilih.')
+                                        .removeClass('hidden');
+                                }
+                            } else {
+                                item.removeClass('pointer-events-none cursor-not-allowed');
+                                radio.prop('disabled', false);
+                                badge.removeClass('bg-red-100 text-red-700').addClass(origClass).text(
+                                    origStatus);
+
+                                if (!radio.is(':checked')) {
+                                    $('#error-id_lab').addClass('hidden');
+                                }
+                            }
+                        });
+
                         $('.tool-item').each(function() {
                             let item = $(this);
                             let alatId = item.attr('data-alat-id');
@@ -313,11 +355,12 @@
                                 }
                             }
                         });
+
                         updateToolCount();
                     }
                 },
                 complete: function() {
-                    $('#toolsContainer').css('opacity', '1');
+                    $('#toolsContainer, .lab-item').css('opacity', '1');
                 }
             });
         }

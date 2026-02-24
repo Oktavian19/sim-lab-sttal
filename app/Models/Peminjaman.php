@@ -52,7 +52,7 @@ class Peminjaman extends Model
 
     public function scopeActiveCollision(Builder $query, $startTime, $endTime, $excludeId = null)
     {
-        return $query->where('status_pengajuan', 'disetujui')
+        return $query->whereIn('status_pengajuan', ['disetujui', 'dipinjam'])
             ->doesntHave('pengembalian')
             ->where(function ($q) use ($startTime, $endTime) {
                 $q->where('start_time', '<', $endTime)
@@ -90,7 +90,7 @@ class Peminjaman extends Model
                 ->get()
                 ->keyBy('id_alat');
 
-            $masterAlat = \App\Models\Alat::whereIn('id', $alatIds)->get()->keyBy('id');
+            $masterAlat = Alat::whereIn('id', $alatIds)->get()->keyBy('id');
 
             foreach ($alatIds as $alatId) {
                 $alat = $masterAlat->get($alatId);
