@@ -52,7 +52,7 @@ class Peminjaman extends Model
 
     public function scopeActiveCollision(Builder $query, $startTime, $endTime, $excludeId = null)
     {
-        return $query->whereIn('status_pengajuan', ['disetujui', 'dipinjam'])
+        return $query->whereIn('status_pengajuan', ['dipending', 'disetujui', 'dipinjam'])
             ->doesntHave('pengembalian')
             ->where(function ($q) use ($startTime, $endTime) {
                 $q->where('start_time', '<', $endTime)
