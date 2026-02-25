@@ -14,7 +14,7 @@
 </head>
 
 <body
-    class="bg-gray-100 font-sans antialiased min-h-screen flex items-center justify-center relative overflow-hidden py-10">
+    class="bg-gray-100 font-sans antialiased min-h-screen flex items-center justify-center relative overflow-x-hidden py-10">
     <div class="absolute top-0 left-0 w-full h-1/2 bg-slate-800 z-0"></div>
     <div class="absolute bottom-0 right-0 text-slate-200 opacity-10 pointer-events-none z-0">
         <i class="fa-solid fa-anchor text-[400px] -mb-20 -mr-20"></i>
