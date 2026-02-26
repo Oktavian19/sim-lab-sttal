@@ -187,8 +187,15 @@
                                     @if ($notif->status_pengajuan == 'disetujui')
                                         <div class="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-green-500"></div>
                                         <div>
-                                            <p class="text-sm text-slate-700">Peminjaman <span
-                                                    class="font-semibold">{{ $notif->kegiatan }}</span> telah disetujui.
+                                            <p class="text-sm text-slate-700">
+                                                @if ($notif->laboratorium)
+                                                    Pengajuan {{ $notif->laboratorium->nama_lab }} untuk kegiatan <span
+                                                        class="font-semibold">{{ $notif->kegiatan }}</span> telah
+                                                    disetujui.
+                                                @else
+                                                    Peminjaman <span class="font-semibold">{{ $notif->kegiatan }}</span>
+                                                    telah disetujui.
+                                                @endif
                                             </p>
                                             <p class="text-xs text-slate-400 mt-1">
                                                 {{ $notif->updated_at->diffForHumans() }}</p>
@@ -196,8 +203,15 @@
                                     @elseif($notif->status_pengajuan == 'dipinjam')
                                         <div class="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-blue-500"></div>
                                         <div>
-                                            <p class="text-sm text-slate-700">Peminjaman <span
-                                                    class="font-semibold">{{ $notif->kegiatan }}</span> sedang dipinjam.
+                                            <p class="text-sm text-slate-700">
+                                                @if ($notif->laboratorium)
+                                                    {{ $notif->laboratorium->nama_lab }} sedang digunakan untuk kegiatan
+                                                    <span class="font-semibold">{{ $notif->kegiatan }}</span>.
+                                                @else
+                                                    Alat untuk kegiatan <span
+                                                        class="font-semibold">{{ $notif->kegiatan }}</span> sedang
+                                                    dipinjam.
+                                                @endif
                                             </p>
                                             <p class="text-xs text-slate-400 mt-1">
                                                 {{ $notif->updated_at->diffForHumans() }}</p>
@@ -205,27 +219,62 @@
                                     @elseif($notif->status_pengajuan == 'ditolak')
                                         <div class="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-red-500"></div>
                                         <div>
-                                            <p class="text-sm text-slate-700">Peminjaman <span
-                                                    class="font-semibold">{{ $notif->kegiatan }}</span> ditolak oleh admin.
+                                            <p class="text-sm text-slate-700">
+                                                @if ($notif->laboratorium)
+                                                    Pengajuan {{ $notif->laboratorium->nama_lab }} untuk kegiatan <span
+                                                        class="font-semibold">{{ $notif->kegiatan }}</span> ditolak oleh
+                                                    admin.
+                                                @else
+                                                    Peminjaman <span class="font-semibold">{{ $notif->kegiatan }}</span>
+                                                    ditolak oleh admin.
+                                                @endif
                                             </p>
                                             <p class="text-xs text-slate-400 mt-1">
                                                 {{ $notif->updated_at->diffForHumans() }}</p>
                                         </div>
                                     @elseif($notif->status_pengajuan == 'selesai')
-                                        <div class="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-blue-500"></div>
+                                        <div class="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-emerald-500"></div>
                                         <div>
-                                            <p class="text-sm text-slate-700">Peminjaman <span
-                                                    class="font-semibold">{{ $notif->kegiatan }}</span> telah selesai
-                                                dikembalikan.</p>
+                                            <p class="text-sm text-slate-700">
+                                                @if ($notif->laboratorium)
+                                                    Peminjaman {{ $notif->laboratorium->nama_lab }} untuk kegiatan <span
+                                                        class="font-semibold">{{ $notif->kegiatan }}</span> telah selesai.
+                                                @else
+                                                    Peminjaman <span class="font-semibold">{{ $notif->kegiatan }}</span>
+                                                    telah selesai dikembalikan.
+                                                @endif
+                                            </p>
+                                            <p class="text-xs text-slate-400 mt-1">
+                                                {{ $notif->updated_at->diffForHumans() }}</p>
+                                        </div>
+                                    @elseif($notif->status_pengajuan == 'dibatalkan')
+                                        <div class="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-gray-500"></div>
+                                        <div>
+                                            <p class="text-sm text-slate-700">
+                                                @if ($notif->laboratorium)
+                                                    Pengajuan {{ $notif->laboratorium->nama_lab }} untuk kegiatan <span
+                                                        class="font-semibold">{{ $notif->kegiatan }}</span> dibatalkan.
+                                                @else
+                                                    Peminjaman <span class="font-semibold">{{ $notif->kegiatan }}</span>
+                                                    dibatalkan.
+                                                @endif
+                                            </p>
                                             <p class="text-xs text-slate-400 mt-1">
                                                 {{ $notif->updated_at->diffForHumans() }}</p>
                                         </div>
                                     @else
                                         <div class="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-yellow-500"></div>
                                         <div>
-                                            <p class="text-sm text-slate-700">Pengajuan <span
-                                                    class="font-semibold">{{ $notif->kegiatan }}</span> sedang diproses
-                                                (Pending).</p>
+                                            <p class="text-sm text-slate-700">
+                                                @if ($notif->laboratorium)
+                                                    Pengajuan {{ $notif->laboratorium->nama_lab }} untuk kegiatan <span
+                                                        class="font-semibold">{{ $notif->kegiatan }}</span> sedang
+                                                    diproses (Pending).
+                                                @else
+                                                    Pengajuan <span class="font-semibold">{{ $notif->kegiatan }}</span>
+                                                    sedang diproses (Pending).
+                                                @endif
+                                            </p>
                                             <p class="text-xs text-slate-400 mt-1">
                                                 {{ $notif->created_at->diffForHumans() }}</p>
                                         </div>
