@@ -193,6 +193,15 @@
                                             <p class="text-xs text-slate-400 mt-1">
                                                 {{ $notif->updated_at->diffForHumans() }}</p>
                                         </div>
+                                    @elseif($notif->status_pengajuan == 'dipinjam')
+                                        <div class="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-blue-500"></div>
+                                        <div>
+                                            <p class="text-sm text-slate-700">Peminjaman <span
+                                                    class="font-semibold">{{ $notif->kegiatan }}</span> sedang dipinjam.
+                                            </p>
+                                            <p class="text-xs text-slate-400 mt-1">
+                                                {{ $notif->updated_at->diffForHumans() }}</p>
+                                        </div>
                                     @elseif($notif->status_pengajuan == 'ditolak')
                                         <div class="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-red-500"></div>
                                         <div>
