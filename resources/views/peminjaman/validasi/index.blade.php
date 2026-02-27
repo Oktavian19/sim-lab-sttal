@@ -21,7 +21,7 @@
                             <th class="px-4 py-3">Rencana Pinjam</th>
                             <th class="px-4 py-3">Kegiatan</th>
                             <th class="px-4 py-3">Jumlah Peserta</th>
-                            <th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th>
+                            <th class="px-4 py-3 rounded-tr-lg !text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

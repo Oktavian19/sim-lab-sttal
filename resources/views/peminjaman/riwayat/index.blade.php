@@ -22,7 +22,7 @@
                             <th class="px-4 py-3">Tanggal Peminjaman</th>
                             <th class="px-4 py-3">Tanggal Kembali</th>
                             <th class="px-4 py-3">Status Pengembalian</th>
-                            <th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th>
+                            <th class="px-4 py-3 rounded-tr-lg !text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

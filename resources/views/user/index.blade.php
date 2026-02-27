@@ -28,7 +28,7 @@
                             <th class="px-4 py-3">Pangkat / Korps</th>
                             <th class="px-4 py-3">Jurusan</th>
                             <th class="px-4 py-3">No. Telepon</th>
-                            <th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th>
+                            <th class="px-4 py-3 rounded-tr-lg !text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

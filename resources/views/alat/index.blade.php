@@ -27,7 +27,7 @@
                             <th class="px-4 py-3">Lokasi (Lab)</th>
                             <th class="px-4 py-3">Tahun Pengadaan</th>
                             <th class="px-4 py-3">Jumlah</th>
-                            <th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th>
+                            <th class="px-4 py-3 rounded-tr-lg !text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

@@ -28,7 +28,7 @@
                             <th class="px-4 py-3">Detail Kerusakan</th>
                             <th class="px-4 py-3">Status</th>
                             <th class="px-4 py-3">Keterangan Perbaikan</th> 
-                            <th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th>
+                            <th class="px-4 py-3 rounded-tr-lg !text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

@@ -27,7 +27,7 @@
                             <th class="px-4 py-3">Kapasitas</th>
                             <th class="px-4 py-3">Deskripsi</th>
                             <th class="px-4 py-3">Status</th>
-                            <th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th>
+                            <th class="px-4 py-3 rounded-tr-lg !text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
