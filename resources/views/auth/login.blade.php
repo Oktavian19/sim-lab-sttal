@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
 </head>
 
 <body class="bg-gray-100 font-sans antialiased h-screen flex items-center justify-center relative overflow-hidden">
@@ -97,7 +98,8 @@
                     </div>
 
                     <div class="text-sm">
-                        <a href="{{ route('register') }}" class="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+                        <a href="{{ route('register') }}"
+                            class="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                             Belum Punya Akun?
                         </a>
                     </div>
