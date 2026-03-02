@@ -1,4 +1,4 @@
-@empty($laboratorium)
+@empty($user)
     <div id="modal-master" class="relative z-50 w-full max-w-lg mx-auto my-10" role="document">
         <div class="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-200">
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
@@ -14,9 +14,9 @@
                         <i class="fas fa-ban mr-2"></i>
                         <span>Kesalahan</span>
                     </div>
-                    <p class="text-sm">Data laboratorium yang anda cari tidak ditemukan.</p>
+                    <p class="text-sm">Data User yang anda cari tidak ditemukan.</p>
                 </div>
-                <a href="{{ url('laboratorium') }}"
+                <a href="{{ url($role) }}"
                     class="inline-block px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg transition-all">
                     <i class="fas fa-arrow-left mr-2"></i> Kembali
                 </a>
@@ -24,12 +24,12 @@
         </div>
     </div>
 @else
-    <form action="{{ url('laboratorium/' . $laboratorium->id . '/destroy') }}" method="POST" id="form-delete" class="validate">
+    <form action="{{ url('/'.$role.'/'.$user->id.'/destroy') }}" method="POST" id="form-delete" class="validate">
         @csrf
         <div id="modal-master" class="relative z-50 w-full max-w-2xl mx-auto my-10" role="document">
             <div class="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-200">
                 <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                    <h5 class="text-xl font-bold text-gray-800">Hapus Data Laboratorium</h5>
+                    <h5 class="text-xl font-bold text-gray-800">Hapus Data User</h5>
                     <button type="button" onclick="hideModal()" class="text-gray-400 hover:text-gray-600">
                         <i class="fas fa-times text-xl"></i>
                     </button>
@@ -41,27 +41,33 @@
                             <i class="fas fa-exclamation-triangle mr-2"></i>
                             <span>Konfirmasi</span>
                         </div>
-                        <p class="text-sm">Apakah Anda yakin ingin menghapus data laboratorium berikut?</p>
+                        <p class="text-sm">Apakah Anda yakin ingin menghapus data user berikut?</p>
                     </div>
 
                     <div class="overflow-hidden border border-gray-200 rounded-lg mb-4">
                         <table class="min-w-full divide-y divide-gray-200">
                             <tr class="bg-gray-50 text-right">
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase w-1/3">Laboratorium:</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase w-1/3">NRP:</th>
                                 <td class="px-4 py-3 text-sm text-gray-900 bg-white text-left italic font-medium">
-                                    {{ $laboratorium->nama_lab }}
+                                    {{ $user->nrp }}
                                 </td>
                             </tr>
                             <tr class="bg-gray-50 text-right">
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase w-1/3">Kapasitas:</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase w-1/3">Nama:</th>
                                 <td class="px-4 py-3 text-sm text-gray-900 bg-white text-left italic font-medium">
-                                    {{ $laboratorium->kapasitas }} Orang
+                                    {{ $user->nama }}
                                 </td>
                             </tr>
                             <tr class="bg-gray-50 text-right">
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase w-1/3">Deskripsi:</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase w-1/3">Pangkat:</th>
                                 <td class="px-4 py-3 text-sm text-gray-900 bg-white text-left italic font-medium">
-                                    {{ $laboratorium->deskripsi ?? '-' }}
+                                    {{ $user->pangkat }} / {{ $user->korps }}
+                                </td>
+                            </tr>
+                            <tr class="bg-gray-50 text-right">
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase w-1/3">Jurusan:</th>
+                                <td class="px-4 py-3 text-sm text-gray-900 bg-white text-left italic font-medium">
+                                    {{ $user->jurusan }}
                                 </td>
                             </tr>
                         </table>
@@ -70,7 +76,7 @@
                     <div class="flex p-4 text-sm text-blue-800 rounded-lg bg-blue-50 border border-blue-100">
                         <i class="fas fa-info-circle mr-3 mt-1 text-blue-500"></i>
                         <div>
-                            <span class="font-bold">Perhatian:</span> Penghapusan laboratorium akan mempengaruhi data alat yang terkait.
+                            <span class="font-bold">Perhatian:</span> Penghapusan user akan mempengaruhi data peminjaman yang terkait.
                         </div>
                     </div>
                 </div>
