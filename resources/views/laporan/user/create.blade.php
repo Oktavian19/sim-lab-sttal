@@ -80,33 +80,36 @@
                                 Foto Bukti Kerusakan <span class="text-red-500">*</span>
                             </label>
 
-                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-red-400 transition-colors relative bg-gray-50"
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-red-400 transition-colors relative bg-gray-50 hover:bg-red-50/50 cursor-pointer group"
                                 id="dropZone">
-                                <div class="space-y-2 text-center" id="uploadState">
-                                    <div class="flex flex-col items-center">
-                                        <div class="p-3 bg-red-100 rounded-full text-red-500 mb-3 shadow-sm">
-                                            <i class="fa-regular fa-image text-2xl"></i>
-                                        </div>
-                                        <div class="flex text-sm text-gray-600 justify-center">
-                                            <label
-                                                class="relative cursor-pointer bg-transparent rounded-md font-medium text-red-600 hover:text-red-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-red-500 px-1">
-                                                <span>Upload file</span>
-                                                <input type="file" id="fotoInput" name="foto" class="sr-only"
-                                                    accept="image/*" onchange="handlePhotoChange(event)" required />
-                                            </label>
-                                            <p className="pl-1">atau drag and drop</p>
-                                        </div>
-                                        <p class="text-xs text-gray-500 mt-1">PNG, JPG, JPEG (Maks. 2MB)</p>
-                                        <p id="error-fotoInput" class="text-red-500 text-sm mt-1 hidden"></p>
-                                    </div>
-                                </div>
 
-                                <div id="previewState" class="hidden text-center">
+                                <label for="fotoInput"
+                                    class="space-y-2 text-center w-full flex flex-col items-center justify-center cursor-pointer"
+                                    id="uploadState">
+                                    <div
+                                        class="p-3 bg-red-100 rounded-full text-red-500 mb-3 shadow-sm group-hover:bg-red-200 transition-colors">
+                                        <i class="fa-regular fa-image text-2xl"></i>
+                                    </div>
+                                    <div class="flex text-sm text-gray-600 justify-center">
+
+                                        <span
+                                            class="relative bg-transparent rounded-md font-medium text-red-600 group-hover:text-red-700 focus-within:outline-none px-1">
+                                            <span>Upload file</span>
+                                            <input type="file" id="fotoInput" name="foto" class="sr-only"
+                                                accept="image/*" onchange="handlePhotoChange(event)" />
+                                        </span>
+                                        <p class="pl-1">atau drag and drop</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">PNG, JPG, JPEG (Maks. 2MB)</p>
+                                    <p id="error-fotoInput" class="text-red-500 text-sm mt-1 hidden"></p>
+                                </label>
+
+                                <div id="previewState" class="hidden text-center w-full">
                                     <div class="relative inline-block">
                                         <img id="imagePreview" src="" alt="Preview"
                                             class="mx-auto h-32 w-auto rounded-lg object-cover shadow-md border border-gray-200" />
                                         <button type="button" onclick="removePhoto()"
-                                            class="absolute -top-3 -right-3 bg-white text-red-600 rounded-full p-1.5 shadow-md border border-red-100 hover:bg-red-50 transition-colors focus:outline-none"
+                                            class="absolute -top-3 -right-3 bg-white text-red-600 rounded-full p-1.5 shadow-md border border-red-100 hover:bg-red-50 transition-colors focus:outline-none z-10"
                                             title="Hapus Foto">
                                             <i class="fa-solid fa-xmark w-4 h-4 flex items-center justify-center"></i>
                                         </button>
@@ -348,7 +351,7 @@
             document.getElementById('btnSubmit').innerHTML =
                 '<i class="fa-solid fa-paper-plane"></i> Kirim Laporan';
         }
-        
+
         $(document).on('submit', 'form.validate', function(e) {
 
             e.preventDefault();
@@ -406,5 +409,41 @@
         });
 
         renderLabs();
+
+        const dropZone = document.getElementById('dropZone');
+        const fotoInput = document.getElementById('fotoInput');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('border-red-500', 'bg-red-50');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('border-red-500', 'bg-red-50');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            let dt = e.dataTransfer;
+            let files = dt.files;
+
+            if (files.length > 0) {
+                fotoInput.files = files;
+
+                const event = new Event('change');
+                fotoInput.dispatchEvent(event);
+            }
+        }, false);
     </script>
 @endpush
